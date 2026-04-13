@@ -1,0 +1,220 @@
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.nav-link.active {
+    font-weight: bold;
+    border-bottom: 2px solid white;
+}
+
+.card {
+    border-radius: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+}
+
+.rebus-image-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 1rem;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rebus-img {
+    max-height: 250px;
+    object-fit: contain;
+}
+#answer-input {
+    border-radius: 0.75rem;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s;
+}
+
+#answer-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+.btn {
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.stats-card, .stats-card-primary, .stats-card-success {
+    transition: all 0.3s;
+}
+
+.stats-card-primary {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border: 1px solid #667eea30;
+}
+
+.stats-card-success {
+    background: linear-gradient(135deg, #84fab015 0%, #8fd3f415 100%);
+    border: 1px solid #84fab030;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-out;
+}
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .display-5 {
+        font-size: 2rem;
+    }
+
+    .btn-lg {
+        font-size: 1rem;
+    }
+}
+.alert {
+    border-radius: 0.75rem;
+    animation: fadeIn 0.3s ease-out;
+}
+.achievement-card {
+    transition: all 0.3s;
+    cursor: default;
+}
+
+.achievement-card:hover {
+    transform: scale(1.05);
+}
+#procedural-time {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.rebus-grid {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+.rebus-cell {
+  text-align: center;
+  width: 120px;
+}
+.cell-image img {
+  border-radius: 1rem;
+  background: #f0f0f0;
+  padding: 0.5rem;
+}
+
+.avatar-wrapper {
+    display: inline-block;
+}
+
+.rebus-grid {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.rebus-cell {
+    text-align: center;
+    width: 120px;
+}
+
+.cell-image img {
+    border-radius: 1rem;
+    background: #f0f0f0;
+    padding: 0.5rem;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.stats-card-primary, .stats-card-success {
+    transition: all 0.3s;
+}
+
+.stats-card-primary {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border: 1px solid #667eea30;
+}
+
+.stats-card-success {
+    background: linear-gradient(135deg, #84fab015 0%, #8fd3f415 100%);
+    border: 1px solid #84fab030;
+}
+
+.achievement-card {
+    transition: all 0.3s;
+    cursor: default;
+}
+
+.achievement-card:hover {
+    transform: scale(1.05);
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.card {
+    border-radius: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+}
+
+.btn {
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
