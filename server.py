@@ -1,6 +1,8 @@
 from flask import Flask, render_template, session, redirect, url_for
 from datetime import datetime
 
+from data.db_session import global_init
+
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
@@ -90,6 +92,11 @@ def profile():
     }
     return render_template('profile.html', active_page='profile', user=user_data)
 
+def main():
+    global_init("db/database.db")
+    app.run()
+
 
 if __name__ == '__main__':
+    main()
     app.run(debug=True)
