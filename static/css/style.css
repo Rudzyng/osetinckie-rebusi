@@ -218,3 +218,55 @@ body {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* Максимально компактные ячейки */
+.rebus-grid {
+    display: flex;
+    gap: 0.5rem;            /* Минимальный отступ */
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+}
+
+.rebus-cell {
+    text-align: center;
+    width: 85px;
+}
+
+.cell-image img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    background: #f8f9fa;
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.btn-empty-cell {
+    width: 40px;
+    height: 40px;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    padding: 0;
+}
+
+.filled-letter {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #198754;
+    color: white;
+    border-radius: 50%;
+}
+
+.cell-letter {
+    margin-top: 6px;
+}

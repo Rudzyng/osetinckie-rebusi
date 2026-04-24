@@ -12,30 +12,17 @@
                 <p class="lead text-muted">Добро пожаловать в мир увлекательных ребусов!</p>
                 <hr class="my-4">
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold fs-5">Выберите тему:</label>
-                    <div class="d-flex justify-content-center gap-3 mt-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="theme" id="theme1" value="space" checked>
-                            <label class="form-check-label fs-5" for="theme1">
-                                🚀 Космос
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="theme" id="theme2" value="animals">
-                            <label class="form-check-label fs-5" for="theme2">
-                                🐱 Животные
-                            </label>
-                        </div>
-                    </div>
+                <div class="dropdown-center mb-4">
+                    <button class="btn btn-secondary btn-lg dropdown-toggle px-5" type="button" id="themesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-grid-3x3-gap-fill me-2"></i>Темы
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="themesDropdown">
+                        <li><a class="dropdown-item" href="/rebus/space">🚀 Космос</a></li>
+                        <li><a class="dropdown-item" href="/rebus/animals">🐱 Животные</a></li>
+                    </ul>
                 </div>
-
-                <a href="/rebus/<theme_id>" id="start-btn" class="btn btn-primary btn-lg px-5 mt-3">
-                    <i class="bi bi-play-fill me-2"></i>Начать решать
-                </a>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

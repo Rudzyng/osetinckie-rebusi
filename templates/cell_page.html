@@ -8,20 +8,21 @@
         <div class="card border-0 shadow-lg">
             <div class="card-header bg-info text-white text-center py-3">
                 <h4 class="mb-0">
-                    <i class="bi bi-image-fill me-2"></i>Что на картинке?
+                    <i class="bi bi-image-fill me-2"></i>Что изображено на картинке?
                 </h4>
             </div>
             <div class="card-body text-center p-4">
-                <div class="rebus-image-container mb-4">
+                <!-- Увеличенная картинка -->
+                <div class="rebus-image-container mb-4 p-4 bg-light rounded-4">
                     <img src="{{ url_for('static', filename='images/' + cell.image) }}"
                          class="img-fluid"
-                         style="max-height: 300px; border-radius: 1rem;"
+                         style="max-height: 350px; border-radius: 1rem;"
                          onerror="this.src='https://via.placeholder.com/300'">
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-bold fs-5">
-                        <i class="bi bi-pencil-square me-2"></i>Введите слово
+                        <i class="bi bi-pencil-square me-2"></i>Введите слово (на русском)
                     </label>
                     <input type="text" id="word-guess" class="form-control form-control-lg text-center"
                            placeholder="Например: КОТ" autocomplete="off">
@@ -37,4 +38,51 @@
     </div>
 </div>
 
+<script>
+    const correctWord = "{{ cell.correct_word }}".toUpperCase();
+    const firstLetter = correctWord[0];
+    const themeId = "{{ theme_id }}";
+    const cellId = {{ cell_id }};
+
+    document.getElementById('submit-guess').addEventListener('click', async function() {
+        const userGuess = document.getElementById('word-guess').value.trim().toUpperCase();
+        const resultDiv = document.getElementById('guess-result');
+
+        if (userGuess === correctWord) {
+            // Отправляем на сервер для сохранения
+            const response = await fetch('/fill_cell', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    theme_id: themeId,
+                    cell_id: cellId,
+                    letter: firstLetter
+                })
+            });
+
+            if (response.ok) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        ✅ Правильно! Буква <strong class="fs-3">"${firstLetter}"</strong> добавлена в ребус.<br>
+                        <a href="/rebus/${themeId}" class="btn btn-success mt-3">
+                            <i class="bi bi-arrow-return-left me-2"></i>Вернуться к ребусу
+                        </a>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = '<div class="alert alert-danger">❌ Ошибка сохранения, попробуйте ещё раз</div>';
+            }
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle-fill me-2"></i>❌ Неверно, попробуйте ещё раз</div>';
+        }
+    });
+
+    // Enter для отправки
+    document.getElementById('word-guess').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('submit-guess').click();
+        }
+    });
+</script>
 {% endblock %}

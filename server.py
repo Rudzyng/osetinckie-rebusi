@@ -1,14 +1,30 @@
-from flask import Flask, render_template, session, redirect, url_for
+from flask import Flask, render_template, session, redirect, url_for, request
 from datetime import datetime
-
-from data.db_session import global_init
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-@app.context_processor
-def inject_current_time():
-    return {'current_time': datetime.now().strftime('%H:%M:%S')}
+# ========== ТЕМЫ ==========
+THEMES = {
+    "space": {
+        "name": "Космос",
+        "cells": [
+            {"image": "moon.png", "correct_word": "Луна"},
+            {"image": "star.png", "correct_word": "Звезда"},
+            {"image": "rocket.png", "correct_word": "Ракета"},
+        ],
+        "final_answer": "ЛУНАЗВЕЗДАРАКЕТА"
+    },
+    "animals": {
+        "name": "Животные",
+        "cells": [
+            {"image": "cat.png", "correct_word": "Кот"},
+            {"image": "dog.png", "correct_word": "Пёс"},
+            {"image": "fox.png", "correct_word": "Лиса"},
+        ],
+        "final_answer": "КОТПЁСЛИСА"
+    }
+}
 
 
 @app.route('/')
@@ -23,6 +39,7 @@ def rebus_page(theme_id):
 
     theme = THEMES[theme_id]
     filled_key = f'filled_cells_{theme_id}'
+
     if filled_key not in session:
         session[filled_key] = {}
 
@@ -68,7 +85,6 @@ def cell_page(theme_id, cell_id):
 
 @app.route('/fill_cell', methods=['POST'])
 def fill_cell():
-    from flask import request
     data = request.json
     theme_id = data.get('theme_id')
     cell_id = str(data.get('cell_id'))
@@ -92,11 +108,6 @@ def profile():
     }
     return render_template('profile.html', active_page='profile', user=user_data)
 
-def main():
-    global_init("db/database.db")
-    app.run()
-
 
 if __name__ == '__main__':
-    main()
     app.run(debug=True)
