@@ -133,30 +133,22 @@ def check_final_word():
     data = request.json
     rebus_id = data['rebus_id']
     user_ossetian = data['final_word'].strip().upper()
-    user_russian = data['ru_word'].strip().upper()
 
     db = get_db()
-    correct = db.execute('SELECT final_word, ru_word FROM rebuses WHERE id = ?', (rebus_id,)).fetchone()
+    correct = db.execute('SELECT final_word FROM rebuses WHERE id = ?', (rebus_id,)).fetchone()
     db.close()
 
     if not correct:
         return jsonify({'success': False, 'message': 'Ребус не найден'})
 
-    if user_ossetian != correct['final_word'].upper() or (
-            correct['ru_word'] and user_russian != correct['ru_word'].upper()):
-        errors = []
-        if user_ossetian != correct['final_word'].upper():
-            errors.append('осетинское слово неверно')
-        if correct['ru_word'] and user_russian != correct['ru_word'].upper():
-            errors.append('русский перевод неверен')
-        return jsonify({'success': False, 'message': f'❌ {", ".join(errors)}'})
+    if user_ossetian != correct['final_word'].upper():
+        return jsonify({'success': False, 'message': f'❌ Неправильно! Попробуйте ещё раз.'})
 
     stats_key = 'user_stats'
     if stats_key not in session:
         session[stats_key] = {'rebuses_solved': 0, 'words_solved': 0}
 
-    letters_count = get_db().execute('SELECT COUNT(*) as cnt FROM letters WHERE rebus_id = ?', (rebus_id,)).fetchone()[
-        'cnt']
+    letters_count = get_db().execute('SELECT COUNT(*) as cnt FROM letters WHERE rebus_id = ?', (rebus_id,)).fetchone()['cnt']
 
     completed_key = f'rebus_{rebus_id}_completed'
     if not session.get(completed_key):
@@ -165,7 +157,7 @@ def check_final_word():
         session[completed_key] = True
         session.modified = True
 
-    return jsonify({'success': True, 'message': 'Поздравляем! Ребус решён!',
+    return jsonify({'success': True, 'message': f'Поздравляем! Слово "{correct["final_word"]}" отгадано!',
                     'rebuses': session[stats_key]['rebuses_solved'], 'words': session[stats_key]['words_solved']})
 
 
