@@ -1,76 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %}Профиль пользователя{% endblock %}
+{% block title %}Профиль{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-lg">
-            <div class="card-header bg-primary text-white text-center py-4">
-                <i class="bi bi-person-circle display-1"></i>
-                <h2 class="mt-2 mb-0">Страница пользователя</h2>
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="bi bi-person-circle"></i> {{ user.nickname }}</h4>
             </div>
-            <div class="card-body p-4">
-                <div class="text-center mb-4">
-                    <div class="avatar-wrapper mb-3">
-                        <img src="{{ url_for('static', filename='images/avatar.png') }}"
-                             alt="Аватар"
-                             class="rounded-circle border border-3 border-primary"
-                             width="120" height="120"
-                             onerror="this.src='https://via.placeholder.com/120'">
-                    </div>
-                    <h3 class="mb-1" id="username-display">{{ user.nickname }}</h3>
-                    <p class="text-muted">
-                        <i class="bi bi-calendar3 me-1"></i>Участник с {{ user.join_date }}
-                    </p>
-                </div>
-
-                <div class="card bg-light mb-4 border-0">
-                    <div class="card-body">
-                        <label class="form-label fw-bold">
-                            <i class="bi bi-pencil-square me-1"></i>Никнейм
-                        </label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="nickname-input" value="{{ user.nickname }}">
-                            <button class="btn btn-primary" id="update-nickname-btn">
-                                <i class="bi bi-save me-1"></i>Обновить
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <div class="stats-card-primary text-center p-4 rounded-3">
-                            <i class="bi bi-chat-dots fs-1 text-primary"></i>
-                            <h5 class="mt-2 mb-0">Собрано слов</h5>
-                            <span class="display-5 fw-bold text-primary" id="profile-words">0</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="stats-card-success text-center p-4 rounded-3">
-                            <i class="bi bi-trophy fs-1 text-success"></i>
-                            <h5 class="mt-2 mb-0">Решено ребусов</h5>
-                            <span class="display-5 fw-bold text-success" id="profile-rebuses">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <h5 class="mb-3">
-                    <i class="bi bi-stars me-2 text-warning"></i>Достижения
-                </h5>
+            <div class="card-body text-center">
+                <p>Дата регистрации: {{ user.join_date }}</p>
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="achievement-card text-center p-3 rounded-3" id="master-achievement">
-                            <i class="bi bi-trophy-fill fs-2"></i>
-                            <small class="d-block fw-bold mt-1">Мастер ребусов</small>
-                            <small class="text-muted" id="master-status">🔒 Не получено</small>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <h5>Решено ребусов</h5>
+                            <span class="display-4">{{ stats.rebuses_solved }}</span>
                         </div>
                     </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <h5>Собрано слов</h5>
+                            <span class="display-4">{{ stats.words_solved }}</span>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h5>Изменить никнейм</h5>
+                <div class="input-group mb-3">
+                    <input type="text" id="nickname-input" class="form-control" value="{{ user.nickname }}">
+                    <button class="btn btn-primary" id="update-nickname">Сохранить</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
+<script>
+    document.getElementById('update-nickname').addEventListener('click', async () => {
+        const newNick = document.getElementById('nickname-input').value.trim();
+        if (newNick) {
+            const res = await fetch('/update_nickname', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({nickname: newNick})
+            });
+            if (res.ok) location.reload();
+        }
+    });
+</script>
 {% endblock %}

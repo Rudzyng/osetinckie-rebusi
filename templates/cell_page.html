@@ -1,88 +1,76 @@
 {% extends "base.html" %}
 
-{% block title %}Разгадай картинку{% endblock %}
+{% block title %}Угадайте букву{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card border-0 shadow-lg">
-            <div class="card-header bg-info text-white text-center py-3">
-                <h4 class="mb-0">
-                    <i class="bi bi-image-fill me-2"></i>Что изображено на картинке?
-                </h4>
+        <div class="card shadow">
+            <div class="card-header bg-info text-white text-center">
+                <h4>Что изображено?</h4>
             </div>
-            <div class="card-body text-center p-4">
-                <!-- Увеличенная картинка -->
-                <div class="rebus-image-container mb-4 p-4 bg-light rounded-4">
-                    <img src="{{ url_for('static', filename='images/' + cell.image) }}"
-                         class="img-fluid"
-                         style="max-height: 350px; border-radius: 1rem;"
-                         onerror="this.src='https://via.placeholder.com/300'">
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='images/rebus/' + folder_name + '/' + image_filename) }}"
+                     class="img-fluid mb-3" style="max-height: 250px;">
+
+                <div class="alert alert-info mt-2">
+                    <strong>Подсказка:</strong> {{ word_disc }}
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold fs-5">
-                        <i class="bi bi-pencil-square me-2"></i>Введите слово (на русском)
-                    </label>
-                    <input type="text" id="word-guess" class="form-control form-control-lg text-center"
-                           placeholder="Например: КОТ" autocomplete="off">
-                </div>
-
-                <button id="submit-guess" class="btn btn-primary btn-lg w-100">
-                    <i class="bi bi-check-lg me-2"></i>Проверить
-                </button>
-
-                <div id="guess-result" class="mt-4"></div>
+                <input type="text" id="answer" class="form-control form-control-lg text-center"
+                       placeholder="Ваш ответ" autocomplete="off">
+                <button id="check-btn" class="btn btn-primary btn-lg mt-3">Проверить</button>
+                <div id="result" class="mt-3"></div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    const correctWord = "{{ cell.correct_word }}".toUpperCase();
-    const firstLetter = correctWord[0];
-    const themeId = "{{ theme_id }}";
-    const cellId = {{ cell_id }};
+    const checkBtn = document.getElementById('check-btn');
+    const answerInput = document.getElementById('answer');
+    const resultDiv = document.getElementById('result');
+    const position = {{ position }};
+    const rebusId = {{ rebus_id }};
 
-    document.getElementById('submit-guess').addEventListener('click', async function() {
-        const userGuess = document.getElementById('word-guess').value.trim().toUpperCase();
-        const resultDiv = document.getElementById('guess-result');
+    console.log('Страница буквы:', {rebusId, position});
 
-        if (userGuess === correctWord) {
-            // Отправляем на сервер для сохранения
-            const response = await fetch('/fill_cell', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    theme_id: themeId,
-                    cell_id: cellId,
-                    letter: firstLetter
-                })
-            });
+    async function checkAnswer() {
+        const userAnswer = answerInput.value.trim();
 
-            if (response.ok) {
-                resultDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        ✅ Правильно! Буква <strong class="fs-3">"${firstLetter}"</strong> добавлена в ребус.<br>
-                        <a href="/rebus/${themeId}" class="btn btn-success mt-3">
-                            <i class="bi bi-arrow-return-left me-2"></i>Вернуться к ребусу
-                        </a>
-                    </div>
-                `;
-            } else {
-                resultDiv.innerHTML = '<div class="alert alert-danger">❌ Ошибка сохранения, попробуйте ещё раз</div>';
-            }
+        if (!userAnswer) {
+            resultDiv.innerHTML = '<div class="alert alert-warning">Введите ответ!</div>';
+            return;
+        }
+
+        console.log('Отправка проверки:', {rebusId, position, userAnswer});
+
+        const response = await fetch('/check_letter', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                rebus_id: rebusId,
+                position: position,
+                answer: userAnswer
+            })
+        });
+
+        const data = await response.json();
+        console.log('Ответ сервера:', data);
+
+        if (data.success) {
+            resultDiv.innerHTML = `<div class="alert alert-success">✅ Правильно! Буква "${data.letter}" добавлена в ребус.</div>`;
+            setTimeout(() => window.location.href = `/rebus/${rebusId}`, 1500);
         } else {
-            resultDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle-fill me-2"></i>❌ Неверно, попробуйте ещё раз</div>';
+            resultDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.message || 'Неправильно, попробуйте ещё раз'}</div>`;
         }
-    });
+    }
 
-    // Enter для отправки
-    document.getElementById('word-guess').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            document.getElementById('submit-guess').click();
-        }
+    checkBtn.addEventListener('click', checkAnswer);
+    answerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkAnswer();
     });
 </script>
 {% endblock %}

@@ -1,3 +1,4 @@
+/* Основные переменные */
 :root {
     --primary-color: #0d6efd;
     --success-color: #198754;
@@ -5,20 +6,17 @@
     --info-color: #0dcaf0;
 }
 
+/* Глобальные стили */
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
 }
 
-.app {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
+/* Навигация */
 .navbar {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .nav-link.active {
@@ -26,51 +24,112 @@ body {
     border-bottom: 2px solid white;
 }
 
+/* Карточки */
 .card {
     border-radius: 1rem;
     transition: transform 0.2s, box-shadow 0.2s;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(2px);
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
 }
 
-.rebus-image-container {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 1rem;
-    min-height: 250px;
+.card-header {
+    border-radius: 1rem 1rem 0 0 !important;
+}
+
+/* Сетка ребуса */
+.rebus-grid {
     display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.rebus-cell {
+    text-align: center;
+    width: 110px;
+    transition: transform 0.2s;
+}
+
+.rebus-cell:hover {
+    transform: scale(1.02);
+}
+
+/* Картинка в ячейке */
+.cell-image img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 16px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+
+.cell-image img:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Кнопка-заглушка для неотгаданной буквы */
+.btn-empty-cell {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+    background-color: #f0f2f5;
+    border-radius: 50%;
+    text-decoration: none;
+    color: #0d6efd;
+    border: 2px solid #0d6efd;
+    transition: all 0.2s;
 }
 
-.rebus-img {
-    max-height: 250px;
-    object-fit: contain;
-}
-#answer-input {
-    border-radius: 0.75rem;
-    border: 2px solid #e0e0e0;
-    transition: all 0.3s;
+.btn-empty-cell:hover {
+    background-color: #0d6efd;
+    color: white;
+    transform: scale(1.05);
+    text-decoration: none;
 }
 
-#answer-input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-.btn {
-    border-radius: 0.75rem;
-    font-weight: 500;
-    transition: all 0.3s;
+/* Отгаданная буква */
+.filled-letter {
+    width: 50px;
+    height: 50px;
+    font-size: 26px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #198754, #157347);
+    color: white;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+/* Прогресс-бар */
+.progress {
+    border-radius: 20px;
+    height: 12px;
+    background-color: #e9ecef;
 }
-.stats-card, .stats-card-primary, .stats-card-success {
+
+.progress-bar {
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+/* Статистика */
+.stats-card-primary, .stats-card-success {
     transition: all 0.3s;
+    border-radius: 1rem;
 }
 
 .stats-card-primary {
@@ -82,6 +141,20 @@ body {
     background: linear-gradient(135deg, #84fab015 0%, #8fd3f415 100%);
     border: 1px solid #84fab030;
 }
+
+/* Кнопки */
+.btn {
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Анимации */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -94,179 +167,108 @@ body {
 }
 
 .card {
-    animation: fadeIn 0.5s ease-out;
-}
-@media (max-width: 768px) {
-    .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-
-    .display-5 {
-        font-size: 2rem;
-    }
-
-    .btn-lg {
-        font-size: 1rem;
-    }
-}
-.alert {
-    border-radius: 0.75rem;
     animation: fadeIn 0.3s ease-out;
 }
-.achievement-card {
-    transition: all 0.3s;
-    cursor: default;
-}
 
-.achievement-card:hover {
-    transform: scale(1.05);
-}
-#procedural-time {
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    color: var(--primary-color);
-}
-
-.rebus-grid {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 2rem 0;
-}
-.rebus-cell {
-  text-align: center;
-  width: 120px;
-}
-.cell-image img {
-  border-radius: 1rem;
-  background: #f0f0f0;
-  padding: 0.5rem;
-}
-
-.avatar-wrapper {
-    display: inline-block;
-}
-
-.rebus-grid {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 2rem 0;
-}
-
-.rebus-cell {
-    text-align: center;
-    width: 120px;
-}
-
-.cell-image img {
-    border-radius: 1rem;
-    background: #f0f0f0;
-    padding: 0.5rem;
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-}
-
-.stats-card-primary, .stats-card-success {
-    transition: all 0.3s;
-}
-
-.stats-card-primary {
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-    border: 1px solid #667eea30;
-}
-
-.stats-card-success {
-    background: linear-gradient(135deg, #84fab015 0%, #8fd3f415 100%);
-    border: 1px solid #84fab030;
-}
-
-.achievement-card {
-    transition: all 0.3s;
-    cursor: default;
-}
-
-.achievement-card:hover {
-    transform: scale(1.05);
-}
-
-.progress {
-    border-radius: 10px;
-}
-
-.card {
-    border-radius: 1rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
-}
-
-.btn {
+.alert {
     border-radius: 0.75rem;
-    font-weight: 500;
-    transition: all 0.3s;
+    animation: fadeIn 0.2s ease-out;
 }
 
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+/* Достижения (для профиля) */
+.achievement-card {
+    transition: all 0.2s;
+    cursor: default;
+    border-radius: 1rem;
 }
 
-/* Максимально компактные ячейки */
+.achievement-card:hover {
+    transform: scale(1.03);
+    background-color: rgba(255,193,7,0.2) !important;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .rebus-grid {
+        gap: 0.75rem;
+    }
+    .rebus-cell {
+        width: 85px;
+    }
+    .cell-image img {
+        width: 70px;
+        height: 70px;
+    }
+    .btn-empty-cell, .filled-letter {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+    }
+    .display-4 {
+        font-size: 2rem;
+    }
+}
+
 .rebus-grid {
-    display: flex;
-    gap: 0.5rem;            /* Минимальный отступ */
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
 .rebus-cell {
     text-align: center;
-    width: 85px;
+    padding: 15px;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    background-color: #f8f9fa;
 }
 
 .cell-image img {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-    background: #f8f9fa;
-    padding: 6px;
-    border-radius: 10px;
-}
-
-.btn-empty-cell {
-    width: 40px;
-    height: 40px;
-    border-radius: 50% !important;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    padding: 0;
-}
-
-.filled-letter {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #198754;
-    color: white;
-    border-radius: 50%;
+    width: 100%;
+    max-width: 100px;
+    height: auto;
+    border-radius: 5px;
 }
 
 .cell-letter {
-    margin-top: 6px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filled-letter {
+    font-size: 32px;
+    font-weight: bold;
+    color: #28a745;
+    background-color: #d4edda;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin: 0 auto;
+}
+
+.btn-empty-cell {
+    font-size: 32px;
+    text-decoration: none;
+    background-color: #e9ecef;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.btn-empty-cell:hover {
+    background-color: #dee2e6;
+    transform: scale(1.05);
 }
