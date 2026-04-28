@@ -13,13 +13,20 @@
                 <img src="{{ url_for('static', filename='images/rebus/' + folder_name + '/' + image_filename) }}"
                      class="img-fluid mb-3" style="max-height: 250px;">
 
-                <div class="alert alert-info mt-2">
-                    <strong>Подсказка:</strong> {{ word_disc }}
-                </div>
-
                 <input type="text" id="answer" class="form-control form-control-lg text-center"
                        placeholder="Ваш ответ" autocomplete="off">
+
+                <button id="hint-btn" class="btn btn-warning btn-lg mt-3">💡 Показать подсказку</button>
+
+                <!-- Подсказка теперь ПЕРЕД кнопкой Проверить -->
+                <div id="hint" style="display: none;">
+                    <div class="alert alert-info mt-3">
+                        <strong>Подсказка:</strong> {{ word_disc }}
+                    </div>
+                </div>
+
                 <button id="check-btn" class="btn btn-primary btn-lg mt-3">Проверить</button>
+
                 <div id="result" class="mt-3"></div>
             </div>
         </div>
@@ -32,10 +39,18 @@
     const checkBtn = document.getElementById('check-btn');
     const answerInput = document.getElementById('answer');
     const resultDiv = document.getElementById('result');
+    const hintBtn = document.getElementById('hint-btn');
+    const hintDiv = document.getElementById('hint');
     const position = {{ position }};
     const rebusId = {{ rebus_id }};
 
     console.log('Страница буквы:', {rebusId, position});
+
+    // Обработчик для кнопки подсказки
+    hintBtn.addEventListener('click', () => {
+        hintDiv.style.display = 'block';
+        hintBtn.style.display = 'none';
+    });
 
     async function checkAnswer() {
         const userAnswer = answerInput.value.trim();
