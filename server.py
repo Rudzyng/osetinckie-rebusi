@@ -86,9 +86,16 @@ def rebus_page(rebus_id):
         })
 
     filled_count = sum(1 for c in cells if c['filled'])
-    return render_template('rebus_page.html', rebus_id=rebus_id, final_word=data['final_word'],
-                           ru_word=data['ru_word'], cells=cells, folder_name=data['folder_name'],
-                           all_filled=filled_count == len(cells), filled_count=filled_count, total_count=len(cells))
+    return render_template('rebus_page.html',
+                           rebus_id=rebus_id,
+                           rebus_theme_id=data['theme_id'],  # Добавлено!
+                           final_word=data['final_word'],
+                           ru_word=data['ru_word'],
+                           cells=cells,
+                           folder_name=data['folder_name'],
+                           all_filled=filled_count == len(cells),
+                           filled_count=filled_count,
+                           total_count=len(cells))
 
 
 @app.route('/cell/<int:rebus_id>/<int:position>')
@@ -132,23 +139,24 @@ def check_letter():
 def check_final_word():
     data = request.json
     rebus_id = data['rebus_id']
-    user_ossetian = data['final_word'].strip().upper()
+    user_russian = data['ru_word'].strip().lower()
 
     db = get_db()
-    correct = db.execute('SELECT final_word FROM rebuses WHERE id = ?', (rebus_id,)).fetchone()
+    correct = db.execute('SELECT ru_word FROM rebuses WHERE id = ?', (rebus_id,)).fetchone()
     db.close()
 
     if not correct:
         return jsonify({'success': False, 'message': 'Ребус не найден'})
 
-    if user_ossetian != correct['final_word'].upper():
-        return jsonify({'success': False, 'message': f'❌ Неправильно! Попробуйте ещё раз.'})
+    if user_russian != correct['ru_word'].lower():
+        return jsonify({'success': False, 'message': f'Неправильно! Попробуйте ещё раз.'})
 
     stats_key = 'user_stats'
     if stats_key not in session:
         session[stats_key] = {'rebuses_solved': 0, 'words_solved': 0}
 
-    letters_count = get_db().execute('SELECT COUNT(*) as cnt FROM letters WHERE rebus_id = ?', (rebus_id,)).fetchone()['cnt']
+    letters_count = get_db().execute('SELECT COUNT(*) as cnt FROM letters WHERE rebus_id = ?', (rebus_id,)).fetchone()[
+        'cnt']
 
     completed_key = f'rebus_{rebus_id}_completed'
     if not session.get(completed_key):
@@ -157,9 +165,9 @@ def check_final_word():
         session[completed_key] = True
         session.modified = True
 
-    return jsonify({'success': True, 'message': f'Поздравляем! Слово "{correct["final_word"]}" отгадано!',
-                    'rebuses': session[stats_key]['rebuses_solved'], 'words': session[stats_key]['words_solved']})
-
+    return jsonify({'success': True, 'message': 'Поздравляем! Ребус решён!',
+                    'rebuses': session[stats_key]['rebuses_solved'],
+                    'words': session[stats_key]['words_solved']})
 
 @app.route('/profile')
 def profile():
