@@ -43,11 +43,13 @@
                 <div class="mt-4 p-3 bg-light rounded border border-success">
                     <form id="final-word-form">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Осетинское слово (латиницей):</label>
-                            <input type="text" id="final-word-input" class="form-control"
-                                   placeholder="Введите слово на осетинском" required>
+                            <label class="form-label fw-bold">Русский перевод:</label>
+                            <input type="text" id="ru-word-input" class="form-control"
+                                   placeholder="Введите перевод на русский" required>
+                            <small class="text-muted">Пример: мама, семья, друг, ровесник</small>
                         </div>
                         <button type="submit" class="btn btn-success">Проверить ребус</button>
+                        <button id="continue-to-profile" class="btn btn-primary" style="display: none;">Продолжить</button>
                         <div id="final-result" class="mt-3"></div>
                     </form>
                 </div>
@@ -60,18 +62,17 @@
 
 {% block scripts %}
 <script>
-    // Проверка итогового слова
     const finalForm = document.getElementById('final-word-form');
     if (finalForm) {
         finalForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const finalWordInput = document.getElementById('final-word-input');
-            const userOssetianWord = finalWordInput.value.trim().toUpperCase();
+            const ruWordInput = document.getElementById('ru-word-input');
+            const userRussianWord = ruWordInput.value.trim().toLowerCase();
 
-            if (!userOssetianWord) {
+            if (!userRussianWord) {
                 document.getElementById('final-result').innerHTML =
-                    '<div class="alert alert-warning">⚠️ Введите слово на осетинском!</div>';
+                    '<div class="alert alert-warning">⚠️ Введите русский перевод!</div>';
                 return;
             }
 
@@ -80,12 +81,14 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     rebus_id: {{ rebus_id }},
-                    final_word: userOssetianWord
+                    ru_word: userRussianWord
                 })
             });
 
             const data = await response.json();
             const resultDiv = document.getElementById('final-result');
+            const submitBtn = finalForm.querySelector('button[type="submit"]');
+            const continueBtn = document.getElementById('continue-to-profile');
 
             if (data.success) {
                 resultDiv.innerHTML = `
@@ -94,13 +97,20 @@
                         +1 ребус, +{{ total_count }} слов(а) в статистику!
                     </div>
                 `;
-                setTimeout(() => {
-                    window.location.href = '/profile';
-                }, 2000);
+                submitBtn.style.display = 'none';
+                continueBtn.style.display = 'inline-block';
+                ruWordInput.disabled = true;
             } else {
                 resultDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
             }
         });
+
+        const continueBtn = document.getElementById('continue-to-profile');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => {
+                window.location.href = '/profile';
+            });
+        }
     }
 </script>
 {% endblock %}

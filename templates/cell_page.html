@@ -13,8 +13,14 @@
                 <img src="{{ url_for('static', filename='images/rebus/' + folder_name + '/' + image_filename) }}"
                      class="img-fluid mb-3" style="max-height: 250px;">
 
-                <input type="text" id="answer" class="form-control form-control-lg text-center"
-                       placeholder="Ваш ответ" autocomplete="off">
+                <div class="input-group mb-3">
+                    <input type="text" id="answer" class="form-control form-control-lg text-center"
+                           placeholder="Ваш ответ" autocomplete="off" style="font-size: 24px;">
+                    <button id="ae-btn" class="btn btn-outline-danger" type="button"
+                            style="font-size: 20px; font-weight: bold;">
+                        ӕ
+                    </button>
+                </div>
 
                 <button id="hint-btn" class="btn btn-warning btn-lg mt-3">💡 Показать подсказку</button>
 
@@ -25,6 +31,7 @@
                 </div>
 
                 <button id="check-btn" class="btn btn-primary btn-lg mt-3">Проверить</button>
+                <button id="continue-btn" class="btn btn-success btn-lg mt-3" style="display: none;">Продолжить</button>
 
                 <div id="result" class="mt-3"></div>
             </div>
@@ -36,7 +43,9 @@
 {% block scripts %}
 <script>
     const checkBtn = document.getElementById('check-btn');
+    const continueBtn = document.getElementById('continue-btn');
     const answerInput = document.getElementById('answer');
+    const aeBtn = document.getElementById('ae-btn');
     const resultDiv = document.getElementById('result');
     const hintBtn = document.getElementById('hint-btn');
     const hintDiv = document.getElementById('hint');
@@ -45,14 +54,21 @@
 
     console.log('Страница буквы:', {rebusId, position});
 
-    // Обработчик для кнопки подсказки
+    aeBtn.addEventListener('click', () => {
+        const cursorPos = answerInput.selectionStart;
+        const currentValue = answerInput.value;
+        answerInput.value = currentValue.slice(0, cursorPos) + 'ӕ' + currentValue.slice(cursorPos);
+        answerInput.focus();
+        answerInput.setSelectionRange(cursorPos + 1, cursorPos + 1);
+    });
+
     hintBtn.addEventListener('click', () => {
         hintDiv.style.display = 'block';
         hintBtn.style.display = 'none';
     });
 
     async function checkAnswer() {
-        const userAnswer = answerInput.value.trim();
+        let userAnswer = answerInput.value.trim();
 
         if (!userAnswer) {
             resultDiv.innerHTML = '<div class="alert alert-warning">Введите ответ!</div>';
@@ -76,15 +92,26 @@
 
         if (data.success) {
             resultDiv.innerHTML = `<div class="alert alert-success">✅ Правильно! Буква "${data.letter}" добавлена в ребус.</div>`;
-            setTimeout(() => window.location.href = `/rebus/${rebusId}`, 1500);
+            checkBtn.style.display = 'none';
+            aeBtn.style.display = 'none';
+            continueBtn.style.display = 'inline-block';
+            answerInput.disabled = true;
         } else {
             resultDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.message || 'Неправильно, попробуйте ещё раз'}</div>`;
+            answerInput.value = '';
+            answerInput.focus();
         }
     }
+
+    continueBtn.addEventListener('click', () => {
+        window.location.href = `/rebus/${rebusId}`;
+    });
 
     checkBtn.addEventListener('click', checkAnswer);
     answerInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') checkAnswer();
     });
+
+    answerInput.focus();
 </script>
 {% endblock %}
