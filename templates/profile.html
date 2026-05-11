@@ -3,41 +3,34 @@
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white text-center">
-                <h4><i class="bi bi-person-circle"></i> {{ user.nickname }}</h4>
+<div class="card">
+    <div class="card-header bg-primary text-white text-center">
+        <h4 class="mb-0"><i class="bi bi-person-circle"></i> {{ user.nickname }}</h4>
+    </div>
+    <div class="card-body text-center">
+        <p class="text-muted">📅 Дата регистрации: {{ user.join_date }}</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.rebuses_solved }}</div>
+                <div class="stat-label">Решено ребусов</div>
             </div>
-            <div class="card-body text-center">
-                <p>Дата регистрации: {{ user.join_date }}</p>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="border rounded p-3">
-                            <h5>Решено ребусов</h5>
-                            <span class="display-4">{{ stats.rebuses_solved }}</span>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="border rounded p-3">
-                            <h5>Собрано слов</h5>
-                            <span class="display-4">{{ stats.words_solved }}</span>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <h5>Изменить никнейм</h5>
-                <div class="input-group mb-3">
-                    <input type="text" id="nickname-input" class="form-control" value="{{ user.nickname }}">
-                    <button class="btn btn-primary" id="update-nickname">Сохранить</button>
-                </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.words_solved }}</div>
+                <div class="stat-label">Собрано слов</div>
             </div>
+        </div>
+
+        <hr>
+
+        <h5>✏️ Изменить никнейм</h5>
+        <div class="input-group mt-2">
+            <input type="text" id="nickname-input" class="form-control" value="{{ user.nickname }}">
+            <button class="btn btn-primary" id="update-nickname">Сохранить</button>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
     document.getElementById('update-nickname').addEventListener('click', async () => {
         const newNick = document.getElementById('nickname-input').value.trim();

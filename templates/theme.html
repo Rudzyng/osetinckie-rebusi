@@ -3,25 +3,29 @@
 {% block title %}{{ current_theme.name }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">📚 {{ current_theme.name }} — ребусы</h4>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    {% for rebus in rebuses %}
-                    <a href="{{ url_for('rebus_page', rebus_id=rebus.id) }}" class="list-group-item list-group-item-action">
-                        🧩 Ребус: слово из {{ rebus.final_word|length }} букв
-                        <span class="badge bg-secondary float-end">{{ rebus.final_word|length }} букв</span>
-                    </a>
-                    {% else %}
-                    <p class="text-muted">Нет ребусов в этой теме.</p>
-                    {% endfor %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">📚 {{ current_theme.name }} — ребусы</h4>
+    </div>
+    <div class="card-body p-0">
+        <div class="rebus-list">
+            {% for rebus in rebuses %}
+            <a href="{{ url_for('rebus_page', rebus_id=rebus.id) }}" class="rebus-list-item">
+                <div class="rebus-icon">🧩</div>
+                <div class="rebus-info">
+                    <div class="rebus-title">Ребус: слово из {{ rebus.final_word|length }} букв</div>
+                    <div class="rebus-word">{{ rebus.final_word.upper() }}</div>
                 </div>
-                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mt-3">← Назад к темам</a>
+                <div class="rebus-badge">{{ rebus.final_word|length }} букв</div>
+            </a>
+            {% else %}
+            <div class="text-center p-4">
+                <p class="text-muted">Нет ребусов в этой теме.</p>
             </div>
+            {% endfor %}
+        </div>
+        <div class="p-3 text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">← Назад к темам</a>
         </div>
     </div>
 </div>
