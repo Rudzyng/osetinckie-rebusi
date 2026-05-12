@@ -1,10 +1,19 @@
 import sqlite3
 import os
+import requests
+import uuid
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
-from datetime import datetime
+from datetime import datetime, timedelta
+from constants import APP_SECRET_KEY
+from data.get_points import get_points
+from data.post_points import post_points
+from data.login import login as API_login
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'
+app.secret_key = APP_SECRET_KEY
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, 'db', 'rebus.db')
@@ -54,21 +63,131 @@ def get_rebus_data(rebus_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', themes=get_themes(), active_page='index')
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+
+    user_points = session.get("user_points", None)
+    error = session.pop("error", None)
+
+    return render_template('index.html',
+                           themes=get_themes(),
+                           active_page='index',
+                           user_id=session.get("user_id"),
+                           points=user_points,
+                           error=error)
+
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        if session.get("user_id") and not session.get('is_guest'):
+            return redirect(url_for('index'))
+        if session.get('is_guest'):
+            session.clear()
+        return render_template("login.html")
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    if not (email and password):
+        return render_template("login.html", error={"message": "Заполните все поля"})
+
+    try:
+        API_login(email, password)
+        session.clear()
+        session["user_id"] = email
+        session["is_guest"] = False
+        try:
+            session["user_points"] = get_points()
+        except Exception as e:
+            print(f"Ошибка получения очков: {e}")
+            session["user_points"] = 0
+
+        session["user_stats"] = {'rebuses_solved': 0, 'words_solved': 0}
+        session["join_date"] = datetime.now().strftime('%d.%m.%Y')
+        session["nickname"] = email.split('@')[0]
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка API login: {e}")
+        return render_template("login.html", error={"message": "Ошибка соединения"})
+    except ValueError:
+        return render_template("login.html", error={"message": "Неверный ответ от сервера"})
+    except Exception as e:
+        print(f"Другая ошибка: {e}")
+        session["user_id"] = email
+        session["is_guest"] = False
+        session["user_points"] = 0
+        session["user_stats"] = {'rebuses_solved': 0, 'words_solved': 0}
+        session["join_date"] = datetime.now().strftime('%d.%m.%Y')
+        session["nickname"] = email.split('@')[0]
+
+    return redirect(url_for("index"))
+
+
+@app.route('/guest-login', methods=['POST'])
+def guest_login():
+    guest_id = f"guest_{uuid.uuid4().hex[:8]}"
+    session.clear()
+    session['user_id'] = guest_id
+    session['is_guest'] = True
+    session['user_points'] = 0
+    session['user_stats'] = {'rebuses_solved': 0, 'words_solved': 0}
+    session['join_date'] = datetime.now().strftime('%d.%m.%Y')
+    session['nickname'] = f"Гость_{uuid.uuid4().hex[:4]}"
+    session.permanent = False
+    return redirect(url_for('index'))
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+@app.route("/points", methods=["GET", "POST"])
+def points():
+    if not session.get("user_id"):
+        return jsonify({'success': False, 'message': 'Необходимо войти'})
+
+    if session.get('is_guest'):
+        if request.method == "POST":
+            return jsonify({'success': False, 'message': 'Гости не могут сохранять прогресс'})
+        return jsonify({'success': True, 'points': 0})
+
+    if request.method == "GET":
+        try:
+            session["user_points"] = get_points()
+        except Exception as e:
+            print(f"Ошибка получения очков: {e}")
+            session["user_points"] = 0
+    elif request.method == "POST":
+        try:
+            points = int(request.form.get("points", 0))
+            session["user_points"] = post_points(points)
+        except Exception as e:
+            session["error"] = str(e)
+
+    return redirect(url_for("index"))
 
 
 @app.route('/theme/<int:theme_id>')
 def theme_page(theme_id):
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+
     themes = get_themes()
     current_theme = next((t for t in themes if t['id'] == theme_id), None)
     if not current_theme:
         return redirect(url_for('index'))
     return render_template('theme.html', themes=themes, current_theme=current_theme,
-                           rebuses=get_rebuses_by_theme(theme_id), active_page='themes')
+                           rebuses=get_rebuses_by_theme(theme_id), active_page='themes',
+                           user_id=session.get("user_id"), points=session.get("user_points"))
 
 
 @app.route('/rebus/<int:rebus_id>')
 def rebus_page(rebus_id):
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+
     data = get_rebus_data(rebus_id)
     if not data:
         return redirect(url_for('index'))
@@ -88,18 +207,23 @@ def rebus_page(rebus_id):
     filled_count = sum(1 for c in cells if c['filled'])
     return render_template('rebus_page.html',
                            rebus_id=rebus_id,
-                           rebus_theme_id=data['theme_id'],  # Добавлено!
+                           rebus_theme_id=data['theme_id'],
                            final_word=data['final_word'],
                            ru_word=data['ru_word'],
                            cells=cells,
                            folder_name=data['folder_name'],
                            all_filled=filled_count == len(cells),
                            filled_count=filled_count,
-                           total_count=len(cells))
+                           total_count=len(cells),
+                           user_id=session.get("user_id"),
+                           points=session.get("user_points"))
 
 
 @app.route('/cell/<int:rebus_id>/<int:position>')
 def cell_page(rebus_id, position):
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+
     letter = get_db().execute(
         'SELECT letter, image_filename, word_disc FROM letters WHERE rebus_id = ? AND position = ?',
         (rebus_id, position)).fetchone()
@@ -112,11 +236,15 @@ def cell_page(rebus_id, position):
     folder = get_db().execute('SELECT folder_name FROM rebuses WHERE id = ?', (rebus_id,)).fetchone()['folder_name']
     return render_template('cell_page.html', rebus_id=rebus_id, position=position,
                            letter=letter['letter'].upper(), image_filename=letter['image_filename'],
-                           word_disc=letter['word_disc'], folder_name=folder)
+                           word_disc=letter['word_disc'], folder_name=folder,
+                           user_id=session.get("user_id"), points=session.get("user_points"))
 
 
 @app.route('/check_letter', methods=['POST'])
 def check_letter():
+    if not session.get("user_id"):
+        return jsonify({'success': False, 'message': 'Необходимо войти в систему'})
+
     data = request.json
     rebus_id, position, answer = data['rebus_id'], data['position'], data['answer'].strip().upper()
 
@@ -137,6 +265,9 @@ def check_letter():
 
 @app.route('/check_final_word', methods=['POST'])
 def check_final_word():
+    if not session.get("user_id"):
+        return jsonify({'success': False, 'message': 'Необходимо войти в систему'})
+
     data = request.json
     rebus_id = data['rebus_id']
     user_russian = data['ru_word'].strip().lower()
@@ -169,20 +300,27 @@ def check_final_word():
                     'rebuses': session[stats_key]['rebuses_solved'],
                     'words': session[stats_key]['words_solved']})
 
+
 @app.route('/profile')
 def profile():
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+
     stats = session.get('user_stats', {'rebuses_solved': 0, 'words_solved': 0})
-    nickname = session.get('nickname', 'Игрок')
-    join_date = session.get('join_date')
-    if not join_date:
-        join_date = datetime.now().strftime('%d.%m.%Y')
-        session['join_date'] = join_date
-    return render_template('profile.html', stats=stats, user={'nickname': nickname, 'join_date': join_date},
-                           active_page='profile')
+    nickname = session.get('nickname', session.get('user_id').split('@')[0])
+    join_date = session.get('join_date', datetime.now().strftime('%d.%m.%Y'))
+
+    return render_template('profile.html', stats=stats,
+                           user={'nickname': nickname, 'join_date': join_date, 'email': session.get("user_id")},
+                           active_page='profile',
+                           user_id=session.get("user_id"), points=session.get("user_points"))
 
 
 @app.route('/update_nickname', methods=['POST'])
 def update_nickname():
+    if not session.get("user_id"):
+        return jsonify({'success': False, 'message': 'Необходимо войти в систему'})
+
     new_nick = request.json.get('nickname', '').strip()
     if new_nick:
         session['nickname'] = new_nick
@@ -192,4 +330,4 @@ def update_nickname():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)
