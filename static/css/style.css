@@ -15,10 +15,9 @@ body {
     padding: 10px;
 }
 
-/* Основной контейнер как экран телефона */
 .phone-container {
     width: 100%;
-    max-width: 430px;
+    max-width: 600px;
     height: 800px;
     background: #f8fafc;
     border-radius: 40px;
@@ -29,7 +28,6 @@ body {
     position: relative;
 }
 
-/* Динамическая область для iPhone (notch) */
 .phone-notch {
     width: 150px;
     height: 25px;
@@ -42,7 +40,6 @@ body {
     z-index: 10;
 }
 
-/* Шапка */
 .app-header {
     background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     color: white;
@@ -63,7 +60,6 @@ body {
     opacity: 0.9;
 }
 
-/* Навигация */
 .app-nav {
     background: white;
     border-bottom: 1px solid #e5e7eb;
@@ -88,7 +84,6 @@ body {
     color: #3b82f6;
 }
 
-/* Основной контент - скроллится */
 .app-content {
     flex: 1;
     overflow-y: auto;
@@ -97,13 +92,18 @@ body {
 
 .rebus-grid {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 15px;
+    max-width: 460px;
+    margin: 0 auto;
 }
 
 .rebus-cell {
+    flex: 0 0 auto;
+    width: 90px;
     text-align: center;
-    padding: 10px;
+    padding: 10px 5px;
     background: white;
     border-radius: 15px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -120,6 +120,7 @@ body {
     height: auto;
     border-radius: 10px;
     margin: 0 auto;
+    display: block;
 }
 
 .cell-letter {
@@ -127,12 +128,12 @@ body {
 }
 
 .filled-letter {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: bold;
     color: #10b981;
     background: #d1fae5;
-    width: 55px;
-    height: 55px;
+    width: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,11 +142,11 @@ body {
 }
 
 .btn-empty-cell {
-    font-size: 28px;
+    font-size: 32px;
     text-decoration: none;
     background: #f1f5f9;
-    width: 55px;
-    height: 55px;
+    width: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -161,7 +162,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Прогресс-бар */
 .progress {
     height: 8px;
     border-radius: 10px;
@@ -174,7 +174,6 @@ body {
     transition: width 0.3s ease;
 }
 
-/* Карточки и формы */
 .card {
     border: none;
     border-radius: 20px;
@@ -203,7 +202,6 @@ body {
     font-size: 1rem;
 }
 
-/* Поля ввода */
 .form-control {
     border-radius: 12px;
     border: 2px solid #e2e8f0;
@@ -216,7 +214,6 @@ body {
     box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
 }
 
-/* Кнопка ӕ */
 #ae-btn {
     border-radius: 12px;
     font-size: 20px;
@@ -224,7 +221,6 @@ body {
     padding: 0 15px;
 }
 
-/* Адаптация под маленькие экраны */
 @media (max-width: 430px) {
     .phone-container {
         height: 100vh;
@@ -232,8 +228,29 @@ body {
     }
 
     .rebus-grid {
-        grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
         gap: 10px;
+        max-width: 340px;
+    }
+
+    .rebus-cell {
+        width: 75px;
+    }
+
+    .filled-letter,
+    .btn-empty-cell {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+
+    .cell-image img {
+        max-width: 60px;
+    }
+}
+
+@media (max-width: 360px) {
+    .rebus-cell {
+        width: 65px;
     }
 
     .filled-letter,
@@ -243,12 +260,12 @@ body {
         font-size: 24px;
     }
 
-    .cell-image img {
-        max-width: 70px;
+    .rebus-grid {
+        gap: 8px;
+        max-width: 300px;
     }
 }
 
-/* Стили для скролла */
 .app-content::-webkit-scrollbar {
     width: 4px;
 }
@@ -262,7 +279,6 @@ body {
     border-radius: 10px;
 }
 
-/* Анимации */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -320,7 +336,6 @@ body {
     color: #3b82f6;
 }
 
-/* Стили для profile.html */
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -347,7 +362,6 @@ body {
     margin-top: 5px;
 }
 
-/* Стили для theme.html */
 .rebus-list {
     display: flex;
     flex-direction: column;
