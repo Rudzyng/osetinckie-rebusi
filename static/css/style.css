@@ -1,157 +1,265 @@
-/* Основные переменные */
-:root {
-    --primary-color: #0d6efd;
-    --success-color: #198754;
-    --warning-color: #ffc107;
-    --info-color: #0dcaf0;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* Глобальные стили */
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px;
+}
+
+/* Основной контейнер как экран телефона */
+.phone-container {
+    width: 100%;
+    max-width: 430px;
+    height: 800px;
+    background: #f8fafc;
+    border-radius: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Динамическая область для iPhone (notch) */
+.phone-notch {
+    width: 150px;
+    height: 25px;
+    background: #000;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px;
+    z-index: 10;
+}
+
+/* Шапка */
+.app-header {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    padding: 25px 20px 15px 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.app-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: bold;
+}
+
+.app-header p {
+    font-size: 0.75rem;
+    margin: 5px 0 0 0;
+    opacity: 0.9;
 }
 
 /* Навигация */
-.navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.app-nav {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 10px 20px;
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
 }
 
+.nav-link {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s;
+}
+
+.nav-link:hover,
 .nav-link.active {
-    font-weight: bold;
-    border-bottom: 2px solid white;
+    color: #3b82f6;
 }
 
-/* Карточки */
-.card {
-    border-radius: 1rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(2px);
+/* Основной контент - скроллится */
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
-}
-
-.card-header {
-    border-radius: 1rem 1rem 0 0 !important;
-}
-
-/* Сетка ребуса */
 .rebus-grid {
     display: flex;
     gap: 1rem;
     justify-content: center;
-    flex-wrap: wrap;
-    margin: 2rem 0;
 }
 
 .rebus-cell {
     text-align: center;
-    width: 110px;
+    padding: 10px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 0.2s;
 }
 
-.rebus-cell:hover {
-    transform: scale(1.02);
+.rebus-cell:active {
+    transform: scale(0.98);
 }
 
-/* Картинка в ячейке */
 .cell-image img {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    background: #f8f9fa;
-    padding: 8px;
-    border-radius: 16px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: all 0.2s;
+    width: 100%;
+    max-width: 80px;
+    height: auto;
+    border-radius: 10px;
+    margin: 0 auto;
 }
 
-.cell-image img:hover {
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+.cell-letter {
+    margin-top: 10px;
 }
 
-/* Кнопка-заглушка для неотгаданной буквы */
-.btn-empty-cell {
-    display: inline-flex;
+.filled-letter {
+    font-size: 28px;
+    font-weight: bold;
+    color: #10b981;
+    background: #d1fae5;
+    width: 55px;
+    height: 55px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;
-    height: 50px;
+    border-radius: 12px;
+    margin: 0 auto;
+}
+
+.btn-empty-cell {
     font-size: 28px;
-    background-color: #f0f2f5;
-    border-radius: 50%;
     text-decoration: none;
-    color: #0d6efd;
-    border: 2px solid #0d6efd;
-    transition: all 0.2s;
+    background: #f1f5f9;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid #e2e8f0;
 }
 
 .btn-empty-cell:hover {
-    background-color: #0d6efd;
-    color: white;
+    background: #e2e8f0;
     transform: scale(1.05);
-    text-decoration: none;
-}
-
-/* Отгаданная буква */
-.filled-letter {
-    width: 50px;
-    height: 50px;
-    font-size: 26px;
-    font-weight: bold;
-    background: linear-gradient(135deg, #198754, #157347);
-    color: white;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 /* Прогресс-бар */
 .progress {
-    border-radius: 20px;
-    height: 12px;
-    background-color: #e9ecef;
+    height: 8px;
+    border-radius: 10px;
+    background: #e2e8f0;
 }
 
 .progress-bar {
-    border-radius: 20px;
+    background: #10b981;
+    border-radius: 10px;
     transition: width 0.3s ease;
 }
 
-/* Статистика */
-.stats-card-primary, .stats-card-success {
-    transition: all 0.3s;
-    border-radius: 1rem;
+/* Карточки и формы */
+.card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
 }
 
-.stats-card-primary {
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-    border: 1px solid #667eea30;
+.card-header {
+    border-radius: 20px 20px 0 0 !important;
+    padding: 15px;
 }
 
-.stats-card-success {
-    background: linear-gradient(135deg, #84fab015 0%, #8fd3f415 100%);
-    border: 1px solid #84fab030;
-}
-
-/* Кнопки */
 .btn {
-    border-radius: 0.75rem;
+    border-radius: 12px;
+    padding: 10px 20px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+.btn:active {
+    transform: scale(0.96);
+}
+
+.btn-lg {
+    padding: 12px 24px;
+    font-size: 1rem;
+}
+
+/* Поля ввода */
+.form-control {
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    padding: 12px;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+
+/* Кнопка ӕ */
+#ae-btn {
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0 15px;
+}
+
+/* Адаптация под маленькие экраны */
+@media (max-width: 430px) {
+    .phone-container {
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .rebus-grid {
+        grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+        gap: 10px;
+    }
+
+    .filled-letter,
+    .btn-empty-cell {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .cell-image img {
+        max-width: 70px;
+    }
+}
+
+/* Стили для скролла */
+.app-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.app-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.app-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 }
 
 /* Анимации */
@@ -166,108 +274,123 @@ body {
     }
 }
 
-.card {
-    animation: fadeIn 0.3s ease-out;
+.fade-in {
+    animation: fadeIn 0.3s ease;
 }
 
-.alert {
-    border-radius: 0.75rem;
-    animation: fadeIn 0.2s ease-out;
+/* Стили для index.html - сетка тем */
+.theme-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
 }
 
-/* Достижения (для профиля) */
-.achievement-card {
-    transition: all 0.2s;
-    cursor: default;
-    border-radius: 1rem;
-}
-
-.achievement-card:hover {
-    transform: scale(1.03);
-    background-color: rgba(255,193,7,0.2) !important;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .rebus-grid {
-        gap: 0.75rem;
-    }
-    .rebus-cell {
-        width: 85px;
-    }
-    .cell-image img {
-        width: 70px;
-        height: 70px;
-    }
-    .btn-empty-cell, .filled-letter {
-        width: 40px;
-        height: 40px;
-        font-size: 22px;
-    }
-    .display-4 {
-        font-size: 2rem;
-    }
-}
-
-.rebus-grid {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.rebus-cell {
-    text-align: center;
-    padding: 15px;
-    border: 2px solid #dee2e6;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-}
-
-.cell-image img {
-    width: 100%;
-    max-width: 100px;
-    height: auto;
-    border-radius: 5px;
-}
-
-.cell-letter {
-    min-height: 60px;
+.theme-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-
-.filled-letter {
-    font-size: 32px;
-    font-weight: bold;
-    color: #28a745;
-    background-color: #d4edda;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    margin: 0 auto;
-}
-
-.btn-empty-cell {
-    font-size: 32px;
+    gap: 15px;
     text-decoration: none;
-    background-color: #e9ecef;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    margin: 0 auto;
-    cursor: pointer;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: all 0.3s;
-    border: none;
+    border: 2px solid transparent;
 }
 
-.btn-empty-cell:hover {
-    background-color: #dee2e6;
-    transform: scale(1.05);
+.theme-card:active {
+    transform: scale(0.98);
+    background: #f8fafc;
+}
+
+.theme-icon {
+    font-size: 48px;
+}
+
+.theme-name {
+    flex: 1;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.theme-arrow {
+    font-size: 24px;
+    color: #3b82f6;
+}
+
+/* Стили для profile.html */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+/* Стили для theme.html */
+.rebus-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.rebus-list-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.rebus-list-item:active {
+    background: #f1f5f9;
+}
+
+.rebus-icon {
+    font-size: 28px;
+    margin-right: 15px;
+}
+
+.rebus-info {
+    flex: 1;
+}
+
+.rebus-title {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.rebus-word {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    font-family: monospace;
+}
+
+.rebus-badge {
+    background: #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: #475569;
 }

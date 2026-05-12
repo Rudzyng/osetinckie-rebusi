@@ -284,7 +284,10 @@ def check_final_word():
 
     stats_key = 'user_stats'
     if stats_key not in session:
-        session[stats_key] = {'rebuses_solved': 0, 'words_solved': 0}
+        session[stats_key] = {'rebuses_solved': 0, 'words_solved': 0, 'points': 0}
+
+    if 'points' not in session[stats_key]:
+        session[stats_key]['points'] = 0
 
     letters_count = get_db().execute('SELECT COUNT(*) as cnt FROM letters WHERE rebus_id = ?', (rebus_id,)).fetchone()[
         'cnt']
@@ -293,12 +296,15 @@ def check_final_word():
     if not session.get(completed_key):
         session[stats_key]['rebuses_solved'] += 1
         session[stats_key]['words_solved'] += letters_count
+        session[stats_key]['points'] += 1
         session[completed_key] = True
         session.modified = True
 
-    return jsonify({'success': True, 'message': 'Поздравляем! Ребус решён!',
+    return jsonify({'success': True, 'message': 'Поздравляем! Ребус решён! +1 балл!',
                     'rebuses': session[stats_key]['rebuses_solved'],
-                    'words': session[stats_key]['words_solved']})
+                    'words': session[stats_key]['words_solved'],
+                    'points': session[stats_key]['points']})
+
 
 
 @app.route('/profile')
@@ -327,6 +333,20 @@ def update_nickname():
         session.modified = True
         return jsonify({'success': True})
     return jsonify({'success': False})
+
+@app.route('/get_points', methods=['GET'])
+def get_points():
+    stats = session.get('user_stats', {'points': 0})
+    return jsonify({'points': stats.get('points', 0)})
+
+
+@app.route('/leaderboard')
+def leaderboard():
+    stats = session.get('user_stats', {'points': 0})
+    nickname = session.get('nickname', 'Игрок')
+    return render_template('leaderboard.html',
+                           leaderboard=[{'nickname': nickname, 'points': stats.get('points', 0)}],
+                           active_page='leaderboard')
 
 
 if __name__ == '__main__':

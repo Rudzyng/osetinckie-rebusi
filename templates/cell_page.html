@@ -3,44 +3,37 @@
 {% block title %}Угадайте букву{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-info text-white text-center">
-                <h4>Что изображено?</h4>
-            </div>
-            <div class="card-body text-center">
-                <img src="{{ url_for('static', filename='images/rebus/' + folder_name + '/' + image_filename) }}"
-                     class="img-fluid mb-3" style="max-height: 250px;">
+<div class="card">
+    <div class="card-header bg-info text-white text-center">
+        <h4 class="mb-0">Что изображено?</h4>
+    </div>
+    <div class="card-body text-center">
+        <img src="{{ url_for('static', filename='images/rebus/' + folder_name + '/' + image_filename) }}"
+             class="img-fluid mb-3" style="max-height: 200px; border-radius: 15px;">
 
-                <div class="input-group mb-3">
-                    <input type="text" id="answer" class="form-control form-control-lg text-center"
-                           placeholder="Ваш ответ" autocomplete="off" style="font-size: 24px;">
-                    <button id="ae-btn" class="btn btn-outline-danger" type="button"
-                            style="font-size: 20px; font-weight: bold;">
-                        ӕ
-                    </button>
-                </div>
+        <div class="input-group mb-3">
+            <input type="text" id="answer" class="form-control form-control-lg text-center"
+                   placeholder="Ваш ответ" autocomplete="off" style="font-size: 24px;">
+            <button id="ae-btn" class="btn btn-outline-danger" type="button" style="font-size: 20px; font-weight: bold;">
+                ӕ
+            </button>
+        </div>
 
-                <button id="hint-btn" class="btn btn-warning btn-lg mt-3">💡 Показать подсказку</button>
+        <button id="hint-btn" class="btn btn-warning btn-lg w-100 mb-2">💡 Показать подсказку</button>
 
-                <div id="hint" style="display: none;">
-                    <div class="alert alert-info mt-3">
-                        <strong>Подсказка:</strong> {{ word_disc }}
-                    </div>
-                </div>
-
-                <button id="check-btn" class="btn btn-primary btn-lg mt-3">Проверить</button>
-                <button id="continue-btn" class="btn btn-success btn-lg mt-3" style="display: none;">Продолжить</button>
-
-                <div id="result" class="mt-3"></div>
+        <div id="hint" style="display: none;">
+            <div class="alert alert-info mt-2">
+                <strong>Подсказка:</strong> {{ word_disc }}
             </div>
         </div>
+
+        <button id="check-btn" class="btn btn-primary btn-lg w-100 mt-2">Проверить</button>
+        <button id="continue-btn" class="btn btn-success btn-lg w-100 mt-2" style="display: none;">Продолжить</button>
+
+        <div id="result" class="mt-3"></div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
     const checkBtn = document.getElementById('check-btn');
     const continueBtn = document.getElementById('continue-btn');
@@ -51,8 +44,6 @@
     const hintDiv = document.getElementById('hint');
     const position = {{ position }};
     const rebusId = {{ rebus_id }};
-
-    console.log('Страница буквы:', {rebusId, position});
 
     aeBtn.addEventListener('click', () => {
         const cursorPos = answerInput.selectionStart;
@@ -68,33 +59,22 @@
     });
 
     async function checkAnswer() {
-        let userAnswer = answerInput.value.trim();
-
+        const userAnswer = answerInput.value.trim();
         if (!userAnswer) {
             resultDiv.innerHTML = '<div class="alert alert-warning">Введите ответ!</div>';
             return;
         }
-
-        console.log('Отправка проверки:', {rebusId, position, userAnswer});
-
         const response = await fetch('/check_letter', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                rebus_id: rebusId,
-                position: position,
-                answer: userAnswer
-            })
+            body: JSON.stringify({ rebus_id: rebusId, position: position, answer: userAnswer })
         });
-
         const data = await response.json();
-        console.log('Ответ сервера:', data);
-
         if (data.success) {
-            resultDiv.innerHTML = `<div class="alert alert-success">✅ Правильно! Буква "${data.letter}" добавлена в ребус.</div>`;
+            resultDiv.innerHTML = `<div class="alert alert-success">✅ Правильно! Буква "${data.letter}" добавлена.</div>`;
             checkBtn.style.display = 'none';
             aeBtn.style.display = 'none';
-            continueBtn.style.display = 'inline-block';
+            continueBtn.style.display = 'block';
             answerInput.disabled = true;
         } else {
             resultDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.message || 'Неправильно, попробуйте ещё раз'}</div>`;
@@ -106,12 +86,10 @@
     continueBtn.addEventListener('click', () => {
         window.location.href = `/rebus/${rebusId}`;
     });
-
     checkBtn.addEventListener('click', checkAnswer);
     answerInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') checkAnswer();
     });
-
     answerInput.focus();
 </script>
 {% endblock %}
