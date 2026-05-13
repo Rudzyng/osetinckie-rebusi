@@ -93,32 +93,26 @@ def login():
         return render_template("login.html", error={"message": "Заполните все поля"})
 
     try:
-        API_login(email, password)
+        user_id = API_login(email, password)
         session.clear()
-        session["user_id"] = email
+
+        session["user_id"] = user_id
         session["is_guest"] = False
+
         try:
-            session["user_points"] = get_points()
+            points = get_points(user_id)
+            session["user_points"] = points if points is not None else 0
         except Exception as e:
-            print(f"Ошибка получения очков: {e}")
             session["user_points"] = 0
 
         session["user_stats"] = {'rebuses_solved': 0, 'words_solved': 0}
         session["join_date"] = datetime.now().strftime('%d.%m.%Y')
         session["nickname"] = email.split('@')[0]
-    except requests.exceptions.RequestException as e:
-        print(f"Ошибка API login: {e}")
-        return render_template("login.html", error={"message": "Ошибка соединения"})
-    except ValueError:
-        return render_template("login.html", error={"message": "Неверный ответ от сервера"})
+
     except Exception as e:
-        print(f"Другая ошибка: {e}")
-        session["user_id"] = email
-        session["is_guest"] = False
-        session["user_points"] = 0
-        session["user_stats"] = {'rebuses_solved': 0, 'words_solved': 0}
-        session["join_date"] = datetime.now().strftime('%d.%m.%Y')
-        session["nickname"] = email.split('@')[0]
+        import traceback
+        traceback.print_exc()
+        return render_template("login.html", error={"message": f"Ошибка входа: неверная почта или пароль"})
 
     return redirect(url_for("index"))
 

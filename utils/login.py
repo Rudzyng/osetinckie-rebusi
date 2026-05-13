@@ -1,6 +1,4 @@
-from flask import session
 import requests
-
 from constants import API_SECRET_KEY, API_URL
 
 
@@ -11,18 +9,25 @@ def login(email: str, password: str) -> str:
 
     user_data = {"email": email, "password": password}
 
-    response = requests.post(f"{API_URL}/account/login", json=user_data, headers=headers)
-    response.raise_for_status()
+    try:
+        response = requests.post(f"{API_URL}/account/login", json=user_data, headers=headers)
+        response.raise_for_status()
 
-    data = response.json()
-    user_id = None
+        data = response.json()
 
-    if isinstance(data, dict):
-        user_id = data.get("userId")
+        if isinstance(data, dict):
+            user_id = data.get("userId")
+            if user_id:
+                return str(user_id)
 
-    if not user_id:
-        raise Exception("Не удалось получить ID пользователя")
+        if isinstance(data, dict) and "id" in data:
+            return str(data["id"])
 
-    session["user_id"] = user_id
+        raise ValueError("Не удалось получить ID пользователя из ответа API")
 
-    return user_id
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Ошибка соединения с API: {e}")
+    except ValueError as e:
+        raise e
+    except Exception as e:
+        raise Exception(f"Неизвестная ошибка: {e}")
