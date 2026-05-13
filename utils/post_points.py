@@ -10,16 +10,8 @@ def post_points(user_id: str, amount: int) -> int:
 
     try:
         games = get_all_games()
-        game_id = None
+        game_id = 9
 
-        for game in games:
-            if game.get("gameTitle") == "Тестовая игра":
-                game_id = game.get("gameId")
-                break
-
-        if not game_id:
-            print("Игра 'Тестовая игра' не найдена, создаем новую?")
-            return 0
 
         headers = {
             "X-API-Key": API_SECRET_KEY

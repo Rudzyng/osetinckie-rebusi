@@ -8,17 +8,12 @@
     <div class="rebus-cell">
         <div class="cell-image">
             <img src="{{ url_for('static', filename='images/rebus/' + folder_name + '/' + cell.image) }}"
-                 alt="подсказка"
-                 onerror="this.src='https://via.placeholder.com/100'">
+                 alt="подсказка" onerror="this.src='https://via.placeholder.com/100'">
         </div>
         <div class="cell-letter">
-            {% if cell.filled %}
-                <div class="filled-letter">{{ cell.display_letter }}</div>
-            {% else %}
-                <a href="/cell/{{ rebus_id }}/{{ cell.position }}" class="btn-empty-cell">
-                    ❓
-                </a>
-            {% endif %}
+            <a href="/cell/{{ rebus_id }}/{{ cell.position }}" class="{{ 'filled-letter' if cell.filled else 'btn-empty-cell' }}">
+                {{ cell.display_letter if cell.filled else '❓' }}
+            </a>
         </div>
     </div>
     {% endfor %}
@@ -28,7 +23,7 @@
     <div class="progress mx-auto" style="height: 8px; max-width: 250px;">
         <div class="progress-bar" style="width: {{ (filled_count / total_count * 100) if total_count > 0 else 0 }}%"></div>
     </div>
-    <small class="text-muted">Отгадано букв: {{ filled_count }} из {{ total_count }}</small>
+    <small class="text-muted">{{ filled_count }} из {{ total_count }}</small>
 </div>
 
 {% if all_filled %}
@@ -37,8 +32,7 @@
         <form id="final-word-form">
             <div class="mb-3">
                 <label class="form-label fw-bold">Русский перевод:</label>
-                <input type="text" id="ru-word-input" class="form-control"
-                       placeholder="Введите перевод на русский" required>
+                <input type="text" id="ru-word-input" class="form-control" placeholder="Введите перевод" required>
             </div>
             <button type="submit" class="btn btn-success w-100">Проверить ребус</button>
             <button id="continue-to-profile" class="btn btn-primary w-100 mt-2" style="display: none;">Продолжить</button>
@@ -49,30 +43,28 @@
 {% endif %}
 
 <script>
-    const finalForm = document.getElementById('final-word-form');
-    if (finalForm) {
-        finalForm.addEventListener('submit', async (e) => {
+    const form = document.getElementById('final-word-form');
+    if (form) {
+        form.addEventListener('submit', async e => {
             e.preventDefault();
-            const ruWordInput = document.getElementById('ru-word-input');
-            const userRussianWord = ruWordInput.value.trim().toLowerCase();
-            if (!userRussianWord) {
+            const input = document.getElementById('ru-word-input');
+            const word = input.value.trim().toLowerCase();
+            if (!word) {
                 document.getElementById('final-result').innerHTML = '<div class="alert alert-warning">⚠️ Введите перевод!</div>';
                 return;
             }
-            const response = await fetch('/check_final_word', {
+            const res = await fetch('/check_final_word', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ rebus_id: {{ rebus_id }}, ru_word: userRussianWord })
+                body: JSON.stringify({ rebus_id: {{ rebus_id }}, ru_word: word })
             });
-            const data = await response.json();
+            const data = await res.json();
             const resultDiv = document.getElementById('final-result');
-            const submitBtn = finalForm.querySelector('button[type="submit"]');
-            const continueBtn = document.getElementById('continue-to-profile');
             if (data.success) {
-                resultDiv.innerHTML = `<div class="alert alert-success">✅ ${data.message}<br>+1 ребус, +{{ total_count }} слов(а) в статистику!</div>`;
-                submitBtn.style.display = 'none';
-                continueBtn.style.display = 'block';
-                ruWordInput.disabled = true;
+                resultDiv.innerHTML = `<div class="alert alert-success">✅ ${data.message}<br>+1 ребус, +{{ total_count }} слов(а)!</div>`;
+                form.querySelector('button[type="submit"]').style.display = 'none';
+                document.getElementById('continue-to-profile').style.display = 'block';
+                input.disabled = true;
             } else {
                 resultDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
             }

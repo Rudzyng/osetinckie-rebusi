@@ -11,85 +11,124 @@
         <img src="{{ url_for('static', filename='images/rebus/' + folder_name + '/' + image_filename) }}"
              class="img-fluid mb-3" style="max-height: 200px; border-radius: 15px;">
 
+        {% if already_filled %}
+        <div class="alert alert-warning mb-3">
+            ⚠️ Буква уже отгадана. Можешь улучшить результат!
+            {% if old_score is not none %}
+            <br>Текущий балл: <strong>{{ old_score }}</strong>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <div class="input-group mb-3">
             <input type="text" id="answer" class="form-control form-control-lg text-center"
                    placeholder="Ваш ответ" autocomplete="off" style="font-size: 24px;">
-            <button id="ae-btn" class="btn btn-outline-danger" type="button" style="font-size: 20px; font-weight: bold;">
-                ӕ
-            </button>
+            <button id="ae-btn" class="btn btn-outline-danger" type="button" style="font-size: 20px;">ӕ</button>
         </div>
 
-        <button id="hint-btn" class="btn btn-warning btn-lg w-100 mb-2">💡 Показать подсказку</button>
+        <div id="hints-container" class="mb-3">
+            <button id="hint-1-btn" class="btn btn-outline-secondary btn-sm w-100 mb-1">💡 Значение на русском</button>
+            <div id="hint-1" class="alert alert-info mt-1" style="display: none;">{{ word_disc_ru }}</div>
 
-        <div id="hint" style="display: none;">
-            <div class="alert alert-info mt-2">
-                <strong>Подсказка:</strong> {{ word_disc }}
-            </div>
+            <button id="hint-2-btn" class="btn btn-outline-secondary btn-sm w-100 mb-1" style="display: none;">💡 Первая буква</button>
+            <div id="hint-2" class="alert alert-info mt-1" style="display: none;">{{ word_disc[0] }}</div>
+
+            <button id="hint-3-btn" class="btn btn-outline-secondary btn-sm w-100 mb-1" style="display: none;">💡 Последняя буква</button>
+            <div id="hint-3" class="alert alert-info mt-1" style="display: none;">{{ word_disc[-1] }}</div>
+
+            <button id="hint-4-btn" class="btn btn-outline-secondary btn-sm w-100 mb-1" style="display: none;">💡 Количество букв</button>
+            <div id="hint-4" class="alert alert-info mt-1" style="display: none;">{{ word_disc|length }}</div>
+
+            <button id="hint-5-btn" class="btn btn-outline-danger btn-sm w-100 mb-1" style="display: none;">💡 Ответ</button>
+            <div id="hint-5" class="alert alert-danger mt-1" style="display: none;">{{ word_disc }}</div>
         </div>
 
         <button id="check-btn" class="btn btn-primary btn-lg w-100 mt-2">Проверить</button>
         <button id="continue-btn" class="btn btn-success btn-lg w-100 mt-2" style="display: none;">Продолжить</button>
-
         <div id="result" class="mt-3"></div>
     </div>
 </div>
 
 <script>
-    const checkBtn = document.getElementById('check-btn');
-    const continueBtn = document.getElementById('continue-btn');
     const answerInput = document.getElementById('answer');
-    const aeBtn = document.getElementById('ae-btn');
     const resultDiv = document.getElementById('result');
-    const hintBtn = document.getElementById('hint-btn');
-    const hintDiv = document.getElementById('hint');
     const position = {{ position }};
     const rebusId = {{ rebus_id }};
 
-    aeBtn.addEventListener('click', () => {
-        const cursorPos = answerInput.selectionStart;
-        const currentValue = answerInput.value;
-        answerInput.value = currentValue.slice(0, cursorPos) + 'ӕ' + currentValue.slice(cursorPos);
-        answerInput.focus();
-        answerInput.setSelectionRange(cursorPos + 1, cursorPos + 1);
-    });
+    const hints = [
+        { btn: document.getElementById('hint-1-btn'), div: document.getElementById('hint-1') },
+        { btn: document.getElementById('hint-2-btn'), div: document.getElementById('hint-2') },
+        { btn: document.getElementById('hint-3-btn'), div: document.getElementById('hint-3') },
+        { btn: document.getElementById('hint-4-btn'), div: document.getElementById('hint-4') },
+        { btn: document.getElementById('hint-5-btn'), div: document.getElementById('hint-5') }
+    ];
 
-    hintBtn.addEventListener('click', () => {
-        hintDiv.style.display = 'block';
-        hintBtn.style.display = 'none';
+    let usedHints = 0;
+    let currentHint = 0;
+
+    function showNext() {
+        if (currentHint < hints.length) {
+            hints[currentHint].div.style.display = 'block';
+            hints[currentHint].btn.style.display = 'none';
+            usedHints++;
+            currentHint++;
+            if (currentHint < hints.length) hints[currentHint].btn.style.display = 'block';
+        }
+    }
+
+    hints.forEach(h => h.btn.addEventListener('click', showNext));
+    hints[0].btn.style.display = 'block';
+
+    document.getElementById('ae-btn').addEventListener('click', () => {
+        const pos = answerInput.selectionStart;
+        const val = answerInput.value;
+        answerInput.value = val.slice(0, pos) + 'ӕ' + val.slice(pos);
+        answerInput.focus();
+        answerInput.setSelectionRange(pos + 1, pos + 1);
     });
 
     async function checkAnswer() {
-        const userAnswer = answerInput.value.trim();
-        if (!userAnswer) {
+        const answer = answerInput.value.trim();
+        if (!answer) {
             resultDiv.innerHTML = '<div class="alert alert-warning">Введите ответ!</div>';
             return;
         }
-        const response = await fetch('/check_letter', {
+        const res = await fetch('/check_letter', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ rebus_id: rebusId, position: position, answer: userAnswer })
+            body: JSON.stringify({ rebus_id: rebusId, position, answer, used_hints: usedHints })
         });
-        const data = await response.json();
+        const data = await res.json();
         if (data.success) {
-            resultDiv.innerHTML = `<div class="alert alert-success">✅ Правильно! Буква "${data.letter}" добавлена.</div>`;
-            checkBtn.style.display = 'none';
-            aeBtn.style.display = 'none';
-            continueBtn.style.display = 'block';
+            let msg = `✅ Буква "${data.letter}"`;
+            if (data.old_score !== null && data.old_score !== undefined) {
+                msg += data.score > 0
+                    ? `<br>🎉 Улучшено! +${data.score} балла (буква: ${data.total_score})`
+                    : `<br>📊 Не улучшено (буква: ${data.total_score})`;
+            } else {
+                msg += data.total_score > 0
+                    ? `<br>⭐ +${data.total_score} балла`
+                    : `<br>💀 0 баллов (подсмотрен ответ)`;
+            }
+            msg += `<br>💰 Всего: ${data.total_points}`;
+            resultDiv.innerHTML = `<div class="alert alert-success">${msg}</div>`;
+            document.getElementById('check-btn').style.display = 'none';
+            document.getElementById('ae-btn').style.display = 'none';
+            document.getElementById('continue-btn').style.display = 'block';
             answerInput.disabled = true;
+            hints.forEach(h => { if (h.btn.style.display !== 'none') h.btn.style.display = 'none'; });
         } else {
-            resultDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.message || 'Неправильно, попробуйте ещё раз'}</div>`;
+            resultDiv.innerHTML = '<div class="alert alert-danger">❌ Неправильно</div>';
             answerInput.value = '';
             answerInput.focus();
         }
     }
 
-    continueBtn.addEventListener('click', () => {
+    document.getElementById('check-btn').addEventListener('click', checkAnswer);
+    document.getElementById('continue-btn').addEventListener('click', () => {
         window.location.href = `/rebus/${rebusId}`;
     });
-    checkBtn.addEventListener('click', checkAnswer);
-    answerInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkAnswer();
-    });
+    answerInput.addEventListener('keypress', e => { if (e.key === 'Enter') checkAnswer(); });
     answerInput.focus();
 </script>
 {% endblock %}
