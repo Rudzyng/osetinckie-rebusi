@@ -5,9 +5,9 @@ import uuid
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from datetime import datetime, timedelta
 from constants import APP_SECRET_KEY
-from data.get_points import get_points
-from data.post_points import post_points
-from data.login import login as API_login
+from utils.get_points import get_points
+from utils.post_points import post_points
+from utils.login import login as API_login
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
