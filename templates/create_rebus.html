@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Создать ребус{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+    <div class="card-header bg-success text-white text-center">
+        <h4 class="mb-0">🧩 Создать свой ребус</h4>
+    </div>
+    <div class="card-body">
+        <form id="create-rebus-form" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Тема</label>
+                <select class="form-select" id="theme-select" required>
+                    <option value="">Выбери тему</option>
+                    {% for theme in themes %}
+                    <option value="{{ theme.id }}">{{ theme.name }}</option>
+                    {% endfor %}
+                    <option value="new">+ Новая тема</option>
+                </select>
+            </div>
+
+            <div class="mb-3" id="new-theme-group" style="display: none;">
+                <label class="form-label">Название новой темы</label>
+                <input type="text" class="form-control" id="new-theme-name" placeholder="Например: Природа">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Итоговое слово (осетинское)</label>
+                <input type="text" class="form-control" id="final-word" placeholder="Например: лымӕн" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Русский перевод</label>
+                <input type="text" class="form-control" id="ru-word" placeholder="Например: друг" required>
+            </div>
+
+            <hr>
+            <h5 class="mb-3">Буквы ребуса</h5>
+            <p class="text-muted small">Для каждой буквы укажи картинку и осетинское слово-подсказку.</p>
+
+            <div id="letters-container"></div>
+
+            <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-3" id="add-letter-btn">+ Добавить букву</button>
+
+            <button type="submit" class="btn btn-success w-100">Создать ребус</button>
+            <div id="create-result" class="mt-3"></div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const finalWordInput = document.getElementById('final-word');
+    const lettersContainer = document.getElementById('letters-container');
+    const themeSelect = document.getElementById('theme-select');
+    const newThemeGroup = document.getElementById('new-theme-group');
+    let letterCount = 0;
+
+    themeSelect.addEventListener('change', () => {
+        newThemeGroup.style.display = themeSelect.value === 'new' ? 'block' : 'none';
+    });
+
+    finalWordInput.addEventListener('input', () => {
+        const word = finalWordInput.value.trim();
+        if (word.length > letterCount) {
+            for (let i = letterCount; i < word.length; i++) {
+                addLetterField(i + 1, word[i] || '');
+            }
+        } else if (word.length < letterCount) {
+            while (letterCount > word.length) {
+                lettersContainer.removeChild(lettersContainer.lastChild);
+                letterCount--;
+            }
+        }
+        updatePositions();
+    });
+
+    document.getElementById('add-letter-btn').addEventListener('click', () => {
+        addLetterField(letterCount + 1, '');
+    });
+
+    function addLetterField(pos, letter) {
+        letterCount++;
+        const div = document.createElement('div');
+        div.className = 'card mb-3 p-3 bg-light';
+        div.dataset.position = pos;
+        div.innerHTML = `
+            <div class="row">
+                <div class="col-3">
+                    <label class="form-label small">Позиция</label>
+                    <input type="text" class="form-control text-center" value="${pos}" disabled>
+                </div>
+                <div class="col-9">
+                    <label class="form-label small">Осетинское слово-подсказка</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control word-disc" placeholder="Например: лӕг">
+                        <button type="button" class="btn btn-outline-danger ae-btn">ӕ</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-6">
+                    <label class="form-label small">Русский перевод подсказки</label>
+                    <input type="text" class="form-control word-disc-ru" placeholder="Например: мужчина">
+                </div>
+                <div class="col-6">
+                    <label class="form-label small">Картинка</label>
+                    <input type="file" class="form-control image-file" accept="image/*">
+                    <img class="image-preview mt-2" src="#" style="display: none; max-width: 100%; border-radius: 10px;">
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm mt-2 remove-letter-btn">Удалить</button>
+        `;
+        lettersContainer.appendChild(div);
+
+        div.querySelector('.ae-btn').addEventListener('click', function() {
+            const input = div.querySelector('.word-disc');
+            const cursorPos = input.selectionStart;
+            const currentValue = input.value;
+            input.value = currentValue.slice(0, cursorPos) + 'ӕ' + currentValue.slice(cursorPos);
+            input.focus();
+            input.setSelectionRange(cursorPos + 1, cursorPos + 1);
+        });
+
+        div.querySelector('.image-file').addEventListener('change', function() {
+            const file = this.files[0];
+            const preview = div.querySelector('.image-preview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        div.querySelector('.remove-letter-btn').addEventListener('click', () => {
+            div.remove();
+            letterCount--;
+            updatePositions();
+        });
+    }
+
+    function updatePositions() {
+        const cards = lettersContainer.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.dataset.position = index + 1;
+            card.querySelector('input[disabled]').value = index + 1;
+        });
+        letterCount = cards.length;
+    }
+
+    document.getElementById('create-rebus-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const resultDiv = document.getElementById('create-result');
+
+        let themeId = themeSelect.value;
+        let themeName = null;
+        if (themeId === 'new') {
+            themeName = document.getElementById('new-theme-name').value.trim();
+            if (!themeName) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Введите название новой темы!</div>';
+                return;
+            }
+        }
+
+        const finalWord = finalWordInput.value.trim();
+        const ruWord = document.getElementById('ru-word').value.trim();
+        if (!finalWord || !ruWord) {
+            resultDiv.innerHTML = '<div class="alert alert-warning">Заполните итоговое слово и перевод!</div>';
+            return;
+        }
+
+        const cards = lettersContainer.querySelectorAll('.card');
+        if (cards.length === 0) {
+            resultDiv.innerHTML = '<div class="alert alert-warning">Добавьте хотя бы одну букву!</div>';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('theme_id', themeId === 'new' ? '' : themeId);
+        formData.append('theme_name', themeName || '');
+        formData.append('final_word', finalWord);
+        formData.append('ru_word', ruWord);
+
+        let hasImage = false;
+        for (const card of cards) {
+            const wordDisc = card.querySelector('.word-disc').value.trim();
+            const wordDiscRu = card.querySelector('.word-disc-ru').value.trim();
+            const imageFile = card.querySelector('.image-file').files[0];
+            const pos = card.dataset.position;
+
+            if (!wordDisc) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Заполните слова-подсказки для каждой буквы!</div>';
+                return;
+            }
+
+            formData.append(`pos_${pos}`, pos);
+            formData.append(`word_${pos}`, wordDisc);
+            formData.append(`word_ru_${pos}`, wordDiscRu);
+            if (imageFile) {
+                formData.append(`image_${pos}`, imageFile);
+                hasImage = true;
+            }
+        }
+
+        try {
+            const res = await fetch('/create_rebus', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                resultDiv.innerHTML = `<div class="alert alert-success">✅ Ребус создан! <a href="/rebus/${data.rebus_id}">Открыть</a></div>`;
+                document.getElementById('create-rebus-form').reset();
+                lettersContainer.innerHTML = '';
+                letterCount = 0;
+            } else {
+                resultDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
+            }
+        } catch (err) {
+            resultDiv.innerHTML = '<div class="alert alert-danger">❌ Ошибка соединения</div>';
+        }
+    });
+</script>
+{% endblock %}

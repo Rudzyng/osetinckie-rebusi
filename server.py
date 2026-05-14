@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import uuid
-import requests
+from werkzeug.utils import secure_filename
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from datetime import datetime, timedelta
 from constants import APP_SECRET_KEY
@@ -436,6 +436,82 @@ def how_to_play():
     return render_template('how_to_play.html',
                            user_id=session.get('user_id'),
                            points=session.get('user_points'))
+
+
+@app.route('/create-rebus')
+def create_rebus_page():
+    redirect_result = require_login()
+    if redirect_result:
+        return redirect_result
+    return render_template('create_rebus.html',
+                           themes=get_themes(),
+                           user_id=session.get('user_id'),
+                           points=session.get('user_points'))
+
+
+@app.route('/create_rebus', methods=['POST'])
+def create_rebus():
+    if not session.get('user_id'):
+        return jsonify({'success': False, 'message': 'Необходимо войти'})
+
+    theme_id = request.form.get('theme_id')
+    theme_name = request.form.get('theme_name')
+    final_word = request.form.get('final_word', '').strip().lower()
+    ru_word = request.form.get('ru_word', '').strip().lower()
+
+    if not final_word:
+        return jsonify({'success': False, 'message': 'Введите итоговое слово'})
+
+    db = get_db()
+
+    if theme_name:
+        folder_path = theme_name.lower().replace(' ', '_')
+        db.execute('INSERT INTO themes (name, folder_path) VALUES (?, ?)', (theme_name, folder_path))
+        db.commit()
+        theme_id = db.execute('SELECT last_insert_rowid() as id').fetchone()['id']
+    elif theme_id:
+        theme_id = int(theme_id)
+    else:
+        db.close()
+        return jsonify({'success': False, 'message': 'Выберите тему'})
+
+    folder_name = final_word.replace('ӕ', 'ae').replace('ӕ', 'ae')
+
+    folder_path = os.path.join(BASE_DIR, 'static', 'images', 'rebus', folder_name)
+    os.makedirs(folder_path, exist_ok=True)
+
+    db.execute('INSERT INTO rebuses (final_word, ru_word, folder_name, theme_id) VALUES (?, ?, ?, ?)',
+               (final_word, ru_word, folder_name, theme_id))
+    db.commit()
+    rebus_id = db.execute('SELECT last_insert_rowid() as id').fetchone()['id']
+
+    positions = set()
+    for key in request.form:
+        if key.startswith('pos_'):
+            positions.add(key.split('_')[1])
+
+    for pos in sorted(positions, key=int):
+        word_disc = request.form.get(f'word_{pos}', '')
+        word_disc_ru = request.form.get(f'word_ru_{pos}', '')
+        image_file = request.files.get(f'image_{pos}')
+
+        if image_file and image_file.filename:
+            ext = os.path.splitext(image_file.filename)[1]
+            filename = f"{pos}_{secure_filename(word_disc)}{ext}"
+            image_file.save(os.path.join(folder_path, filename))
+        else:
+            filename = ''
+
+        db.execute(
+            'INSERT INTO letters (rebus_id, position, letter, image_filename, word_disc, word_disc_ru) VALUES (?, ?, ?, ?, ?, ?)',
+            (rebus_id, int(pos), final_word[int(pos) - 1] if int(pos) <= len(final_word) else '',
+             filename, word_disc, word_disc_ru))
+
+    db.commit()
+    db.close()
+
+    return jsonify({'success': True, 'rebus_id': rebus_id})
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
