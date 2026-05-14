@@ -371,6 +371,7 @@ def check_final_word():
         update_user_stats(session['user_id'], rebuses_delta=1, words_delta=letters_count)
         session.modified = True
 
+
     return jsonify({
         'success': True,
         'message': 'Поздравляем! Ребус решён!',
@@ -398,17 +399,6 @@ def profile():
                            user_id=session.get('user_id'),
                            points=session.get('user_points'))
 
-
-@app.route('/update_nickname', methods=['POST'])
-def update_nickname():
-    if not session.get('user_id'):
-        return jsonify({'success': False, 'message': 'Необходимо войти в систему'})
-    new_nick = request.json.get('nickname', '').strip()
-    if new_nick:
-        session['nickname'] = new_nick
-        session.modified = True
-        return jsonify({'success': True})
-    return jsonify({'success': False})
 
 
 @app.route('/get_points', methods=['GET'])
@@ -440,6 +430,12 @@ def leaderboard():
                            user_id=session.get('user_id'),
                            points=session.get('user_points'))
 
+
+@app.route('/how-to-play')
+def how_to_play():
+    return render_template('how_to_play.html',
+                           user_id=session.get('user_id'),
+                           points=session.get('user_points'))
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)

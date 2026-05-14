@@ -8,7 +8,7 @@
         <h4 class="mb-0"><i class="bi bi-person-circle"></i> {{ user.nickname }}</h4>
     </div>
     <div class="card-body text-center">
-        <p class="text-muted">📅 Дата регистрации: {{ user.join_date }}</p>
+        <p class="text-muted">Дата регистрации: {{ user.join_date }}</p>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -20,28 +20,6 @@
                 <div class="stat-label">Собрано слов</div>
             </div>
         </div>
-
-        <hr>
-
-        <h5>✏️ Изменить никнейм</h5>
-        <div class="input-group mt-2">
-            <input type="text" id="nickname-input" class="form-control" value="{{ user.nickname }}">
-            <button class="btn btn-primary" id="update-nickname">Сохранить</button>
-        </div>
     </div>
 </div>
-
-<script>
-    document.getElementById('update-nickname').addEventListener('click', async () => {
-        const newNick = document.getElementById('nickname-input').value.trim();
-        if (newNick) {
-            const res = await fetch('/update_nickname', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({nickname: newNick})
-            });
-            if (res.ok) location.reload();
-        }
-    });
-</script>
 {% endblock %}

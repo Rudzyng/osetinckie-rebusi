@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Как играть{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+    <div class="card-header bg-primary text-white text-center">
+        <h4 class="mb-0">📖 Как играть</h4>
+    </div>
+    <div class="card-body">
+        <h5>Цель игры</h5>
+        <p>Разгадывай осетинские ребусы: угадывай слова по картинкам и собирай из первых букв итоговое слово. Зарабатывай баллы и соревнуйся с другими игроками!</p>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Как всё устроено</h5>
+        <ol class="mb-0">
+            <li class="mb-2"><strong>Выбери тему</strong> — на главном экране доступны темы, в каждой несколько ребусов.</li>
+            <li class="mb-2"><strong>Разгадывай буквы</strong> — каждая картинка это осетинское слово. Напиши его по-осетински. Из первых букв сложится итоговое слово.</li>
+            <li class="mb-2"><strong>Введи итоговое слово</strong> — когда все буквы собраны, введи перевод на русский.</li>
+            <li class="mb-2"><strong>Улучшай результат</strong> — можешь вернуться к любой отгаданной букве и перерешать с меньшим количеством подсказок.</li>
+        </ol>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Подсказки и баллы</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Подсказка</th>
+                        <th>Что показывает</th>
+                        <th>Баллы за букву</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Без подсказок</td>
+                        <td>—</td>
+                        <td><span class="badge bg-success">1.00</span></td>
+                    </tr>
+                    <tr>
+                        <td>1. Значение</td>
+                        <td>Перевод на русский</td>
+                        <td><span class="badge bg-info">0.85</span></td>
+                    </tr>
+                    <tr>
+                        <td>2. Первая буква</td>
+                        <td>Первая буква слова</td>
+                        <td><span class="badge bg-info">0.70</span></td>
+                    </tr>
+                    <tr>
+                        <td>3. Последняя буква</td>
+                        <td>Последняя буква слова</td>
+                        <td><span class="badge bg-info">0.55</span></td>
+                    </tr>
+                    <tr>
+                        <td>4. Количество букв</td>
+                        <td>Сколько букв в слове</td>
+                        <td><span class="badge bg-warning">0.40</span></td>
+                    </tr>
+                    <tr>
+                        <td>5. Ответ</td>
+                        <td>Полностью слово</td>
+                        <td><span class="badge bg-danger">0</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="text-muted small mb-0">Подсказки открываются по порядку. Каждая следующая уменьшает баллы.</p>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Особая буква</h5>
+        <p>В осетинском алфавите есть буква <strong>ӕ</strong>. Для ввода нажми красную кнопку <span class="btn btn-outline-danger btn-sm" style="font-size: 14px;">ӕ</span> рядом с полем ответа.</p>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Вход в игру</h5>
+        <ul class="mb-0">
+            <li><strong>Обычный вход</strong> — с почтой и паролем. Прогресс сохраняется.</li>
+            <li><strong>Гостевой вход</strong> — без регистрации. Прогресс не сохраняется после выхода.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Советы</h5>
+        <ul class="mb-0">
+            <li>Сначала попробуй без подсказок — получишь максимум баллов.</li>
+            <li>Отгаданные буквы можно перерешать, чтобы улучшить результат.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="text-center mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">🧩 К ребусам</a>
+</div>
+{% endblock %}

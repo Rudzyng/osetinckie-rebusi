@@ -13,8 +13,7 @@
             <a href="{{ url_for('rebus_page', rebus_id=rebus.id) }}" class="rebus-list-item">
                 <div class="rebus-icon">🧩</div>
                 <div class="rebus-info">
-                    <div class="rebus-title">Ребус: слово из {{ rebus.final_word|length }} букв</div>
-                    <div class="rebus-word">{{ rebus.final_word.upper() }}</div>
+                    <div class="rebus-word">Ребус: слово из {{ rebus.final_word|length }} букв</div>
                 </div>
                 <div class="rebus-badge">{{ rebus.final_word|length }} букв</div>
             </a>
