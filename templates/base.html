@@ -26,9 +26,11 @@
                 <li><a class="dropdown-item" href="{{ url_for('profile') }}">
                     <i class="bi bi-person-fill"></i> Профиль
                 </a></li>
+                {% if not session.get('is_guest') %}
                 <li><a class="dropdown-item" href="{{ url_for('create_rebus_page') }}">
                     <i class="bi bi-plus-square-fill"></i> Создать ребус
                 </a></li>
+                {% endif %}
                 <li><a class="dropdown-item" href="{{ url_for('how_to_play') }}">
                     <i class="bi bi-book-fill"></i> Как играть
                 </a></li>

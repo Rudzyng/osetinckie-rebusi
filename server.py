@@ -443,6 +443,8 @@ def create_rebus_page():
     redirect_result = require_login()
     if redirect_result:
         return redirect_result
+    if session.get('is_guest'):
+        return redirect(url_for('index'))
     return render_template('create_rebus.html',
                            themes=get_themes(),
                            user_id=session.get('user_id'),
@@ -453,6 +455,8 @@ def create_rebus_page():
 def create_rebus():
     if not session.get('user_id'):
         return jsonify({'success': False, 'message': 'Необходимо войти'})
+    if session.get('is_guest'):
+        return jsonify({'success': False, 'message': 'Гости не могут создавать ребусы'})
 
     theme_id = request.form.get('theme_id')
     theme_name = request.form.get('theme_name')
