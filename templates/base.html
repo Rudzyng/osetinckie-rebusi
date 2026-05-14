@@ -18,20 +18,33 @@
     </div>
 
     <div class="app-nav">
+        <div class="dropdown">
+            <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-grid-fill"></i> Меню
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('profile') }}">
+                    <i class="bi bi-person-fill"></i> Профиль
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('create_rebus_page') }}">
+                    <i class="bi bi-plus-square-fill"></i> Создать ребус
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('how_to_play') }}">
+                    <i class="bi bi-book-fill"></i> Как играть
+                </a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}">
+                    <i class="bi bi-trophy-fill"></i> Лидерборд
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                    <i class="bi bi-box-arrow-right"></i> Выйти
+                </a></li>
+            </ul>
+        </div>
         <a href="{{ url_for('index') }}" class="nav-link">
             <i class="bi bi-house-fill"></i> Главная
-        </a>
-        <a href="{{ url_for('profile') }}" class="nav-link">
-            <i class="bi bi-person-fill"></i> Профиль
-        </a>
-        <a href="{{ url_for('logout') }}" class="nav-link">
-            <i class="bi bi-box-arrow-right"></i> Выйти из аккаунта
-        </a>
-        <a href="{{ url_for('how_to_play') }}" class="nav-link">
-            <i class="bi bi-book-fill"></i> Как играть
-        </a>
-        <a href="{{ url_for('create_rebus_page') }}" class="nav-link">
-            <i class="bi bi-plus-square-fill"></i> Создать
         </a>
     </div>
 
