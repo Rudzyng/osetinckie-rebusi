@@ -6,13 +6,13 @@
 }
 
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
+    background: url('../images/bg/bg.jpg') center/cover no-repeat fixed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 10px;
+    min-height: 100vh;
+    padding: 20px;
 }
 
 .phone-container {
@@ -90,68 +90,98 @@ body {
     padding: 15px;
 }
 
+/* ========== REBUS GRID - ВСЕ В ОДНУ СТРОКУ ========== */
 .rebus-grid {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
-    gap: 15px;
-    max-width: 460px;
-    margin: 0 auto;
+    align-items: stretch;
+    gap: 10px;
+    max-width: 100%;
+    padding: 5px 2px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.rebus-grid::-webkit-scrollbar {
+    height: 3px;
+}
+
+.rebus-grid::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.rebus-grid::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 10px;
 }
 
 .rebus-cell {
-    flex: 0 0 auto;
-    width: 90px;
+    flex: 0 0 80px;
+    min-width: 65px;
     text-align: center;
-    padding: 10px 5px;
+    padding: 10px 6px;
     background: white;
     border-radius: 15px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .rebus-cell:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
+}
+
+.cell-image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .cell-image img {
     width: 100%;
-    max-width: 80px;
+    max-width: 70px;
     height: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover;
     border-radius: 10px;
-    margin: 0 auto;
     display: block;
 }
 
 .cell-letter {
-    margin-top: 10px;
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .filled-letter {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: bold;
     color: #10b981;
     background: #d1fae5;
-    width: 70px;
-    height: 70px;
+    width: 58px;
+    height: 58px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    margin: 0 auto;
+    text-decoration: none;
 }
 
 .btn-empty-cell {
-    font-size: 32px;
+    font-size: 28px;
     text-decoration: none;
     background: #f1f5f9;
-    width: 70px;
-    height: 70px;
+    width: 58px;
+    height: 58px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    margin: 0 auto;
     cursor: pointer;
     transition: all 0.3s;
     border: 2px solid #e2e8f0;
@@ -161,6 +191,141 @@ body {
     background: #e2e8f0;
     transform: scale(1.05);
 }
+
+.btn-empty-cell:active {
+    transform: scale(0.92);
+}
+
+/* ========== АДАПТИВ ДЛЯ РАЗНЫХ ЭКРАНОВ ========== */
+
+/* Планшеты и маленькие ноутбуки */
+@media (max-width: 600px) {
+    .rebus-cell {
+        flex: 0 0 72px;
+        min-width: 58px;
+        padding: 8px 4px;
+    }
+
+    .cell-image img {
+        max-width: 60px;
+    }
+
+    .filled-letter,
+    .btn-empty-cell {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .rebus-grid {
+        gap: 8px;
+    }
+}
+
+/* Большие телефоны */
+@media (max-width: 480px) {
+    .phone-container {
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .rebus-cell {
+        flex: 0 0 65px;
+        min-width: 52px;
+        padding: 6px 3px;
+        border-radius: 12px;
+    }
+
+    .cell-image img {
+        max-width: 50px;
+        border-radius: 8px;
+    }
+
+    .filled-letter,
+    .btn-empty-cell {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+        border-radius: 8px;
+    }
+
+    .cell-letter {
+        margin-top: 5px;
+    }
+
+    .rebus-grid {
+        gap: 6px;
+        padding: 3px 1px;
+    }
+}
+
+/* Маленькие телефоны (до 380px) */
+@media (max-width: 380px) {
+    .rebus-cell {
+        flex: 0 0 55px;
+        min-width: 44px;
+        padding: 4px 2px;
+        border-radius: 10px;
+    }
+
+    .cell-image img {
+        max-width: 40px;
+        border-radius: 6px;
+    }
+
+    .filled-letter,
+    .btn-empty-cell {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+
+    .rebus-grid {
+        gap: 4px;
+    }
+
+    .app-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .app-header {
+        padding: 18px 15px 10px 15px;
+    }
+
+    .app-content {
+        padding: 10px;
+    }
+}
+
+/* Очень узкие экраны (до 320px) */
+@media (max-width: 320px) {
+    .rebus-cell {
+        flex: 0 0 46px;
+        min-width: 38px;
+        padding: 3px 1px;
+        border-radius: 8px;
+    }
+
+    .cell-image img {
+        max-width: 34px;
+        border-radius: 4px;
+    }
+
+    .filled-letter,
+    .btn-empty-cell {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+        border-radius: 5px;
+    }
+
+    .rebus-grid {
+        gap: 3px;
+    }
+}
+
+/* ========== ОСТАЛЬНЫЕ СТИЛИ ========== */
 
 .progress {
     height: 8px;
@@ -221,90 +386,12 @@ body {
     padding: 0 15px;
 }
 
-@media (max-width: 430px) {
-    .phone-container {
-        height: 100vh;
-        border-radius: 0;
-    }
-
-    .rebus-grid {
-        gap: 10px;
-        max-width: 340px;
-    }
-
-    .rebus-cell {
-        width: 75px;
-    }
-
-    .filled-letter,
-    .btn-empty-cell {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
-    }
-
-    .cell-image img {
-        max-width: 60px;
-    }
-}
-
-@media (max-width: 360px) {
-    .rebus-cell {
-        width: 65px;
-    }
-
-    .filled-letter,
-    .btn-empty-cell {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-    }
-
-    .rebus-grid {
-        gap: 8px;
-        max-width: 300px;
-    }
-}
-
-.app-content::-webkit-scrollbar {
-    width: 4px;
-}
-
-.app-content::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-.app-content::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-body {
-    background: url('../images/bg/bg.jpg') center/cover no-repeat fixed;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
-
 .fade-in {
     animation: fadeIn 0.3s ease;
 }
 
-/* Стили для index.html - сетка тем */
+/* ========== СТИЛИ ДЛЯ INDEX.HTML ========== */
+
 .theme-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -417,4 +504,32 @@ body {
     border-radius: 20px;
     font-size: 0.75rem;
     color: #475569;
+}
+
+/* ========== АНИМАЦИИ ========== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== СКРОЛЛ КОНТЕНТА ========== */
+
+.app-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.app-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.app-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 }
