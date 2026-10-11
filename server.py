@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from datetime import datetime
 from constants import APP_SECRET_KEY
+from utils import api
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
@@ -79,7 +80,10 @@ def ensure_stats():
 
 
 @app.route('/')
+@app.route('/start')
 def index():
+    # Портал открывает игру как /start?session=<id>&token=<hmac>.
+    api.get_game_session_id()
     init_session()
     return render_template('index.html',
                            themes=get_themes(),
@@ -244,6 +248,14 @@ def check_final_word():
         session['user_stats']['words_solved'] += letters_count
         session[completed_key] = True
         session.modified = True
+
+        # По контракту портала игровая сессия одноразовая. Ребус начисляет
+        # один балл только при первом полном решении.
+        if session.get('game_session_id'):
+            try:
+                api.add_points(1)
+            except api.ApiError as exc:
+                app.logger.warning("Не удалось начислить баллы портала: %s", exc)
 
     return jsonify({
         'success': True,
