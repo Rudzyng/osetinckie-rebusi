@@ -2,6 +2,7 @@ import sqlite3
 import os
 import uuid
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from datetime import datetime
 from constants import APP_SECRET_KEY
@@ -9,6 +10,15 @@ from utils import api
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
+path_base = os.environ.get('GAME_PATH_BASE', '').rstrip('/')
+app.config['APPLICATION_ROOT'] = path_base or '/'
+app.config['SESSION_COOKIE_PATH'] = path_base or '/'
+app.config['SESSION_COOKIE_NAME'] = os.environ.get(
+    'GAME_COOKIE_NAME', 'lingvogameos_rebusi_session'
+)
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, 'db', 'rebus.db')
@@ -387,7 +397,11 @@ def create_rebus():
     db.commit()
     db.close()
 
-    return jsonify({'success': True, 'rebus_id': rebus_id})
+    return jsonify({
+        'success': True,
+        'rebus_id': rebus_id,
+        'rebus_url': url_for('rebus_page', rebus_id=rebus_id)
+    })
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@
                  alt="подсказка" onerror="this.src='https://via.placeholder.com/100'">
         </div>
         <div class="cell-letter">
-            <a href="/cell/{{ rebus_id }}/{{ cell.position }}" class="{{ 'filled-letter' if cell.filled else 'btn-empty-cell' }}">
+            <a href="{{ url_for('cell_page', rebus_id=rebus_id, position=cell.position) }}" class="{{ 'filled-letter' if cell.filled else 'btn-empty-cell' }}">
                 {{ cell.display_letter if cell.filled else '❓' }}
             </a>
         </div>
@@ -53,7 +53,7 @@
                 document.getElementById('final-result').innerHTML = '<div class="alert alert-warning">⚠️ Введите перевод!</div>';
                 return;
             }
-            const res = await fetch('/check_final_word', {
+            const res = await fetch('{{ url_for("check_final_word") }}', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ rebus_id: {{ rebus_id }}, ru_word: word })
@@ -70,7 +70,7 @@
             }
         });
         document.getElementById('continue-to-profile')?.addEventListener('click', () => {
-            window.location.href = '/profile';
+            window.location.href = '{{ url_for("profile") }}';
         });
     }
 </script>

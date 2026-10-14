@@ -206,13 +206,13 @@
         }
 
         try {
-            const res = await fetch('/create_rebus', {
+            const res = await fetch('{{ url_for("create_rebus") }}', {
                 method: 'POST',
                 body: formData
             });
             const data = await res.json();
             if (data.success) {
-                resultDiv.innerHTML = `<div class="alert alert-success">✅ Ребус создан! <a href="/rebus/${data.rebus_id}">Открыть</a></div>`;
+                resultDiv.innerHTML = `<div class="alert alert-success">✅ Ребус создан! <a href="${data.rebus_url}">Открыть</a></div>`;
                 document.getElementById('create-rebus-form').reset();
                 lettersContainer.innerHTML = '';
                 letterCount = 0;

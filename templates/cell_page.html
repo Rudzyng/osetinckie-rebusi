@@ -93,7 +93,7 @@
             resultDiv.innerHTML = '<div class="alert alert-warning">Введите ответ!</div>';
             return;
         }
-        const res = await fetch('/check_letter', {
+        const res = await fetch('{{ url_for("check_letter") }}', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ rebus_id: rebusId, position, answer, used_hints: usedHints })
@@ -126,7 +126,7 @@
 
     document.getElementById('check-btn').addEventListener('click', checkAnswer);
     document.getElementById('continue-btn').addEventListener('click', () => {
-        window.location.href = `/rebus/${rebusId}`;
+        window.location.href = '{{ url_for("rebus_page", rebus_id=rebus_id) }}';
     });
     answerInput.addEventListener('keypress', e => { if (e.key === 'Enter') checkAnswer(); });
     answerInput.focus();
