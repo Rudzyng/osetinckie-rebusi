@@ -67,6 +67,17 @@ def get_rebus_data(rebus_id):
 
 
 def init_session():
+    if session.get('portal_user_id'):
+        session['user_id'] = session['portal_user_id']
+        session['nickname'] = session.get('portal_user_name') or 'Игрок'
+        session.setdefault('join_date', '')
+        session.setdefault('user_stats', {
+            'rebuses_solved': 0,
+            'words_solved': 0,
+            'points': 0.0
+        })
+        return
+
     if 'user_id' not in session:
         guest_id = f"guest_{uuid.uuid4().hex[:8]}"
         session['user_id'] = guest_id
@@ -92,8 +103,10 @@ def ensure_stats():
 @app.route('/')
 @app.route('/start')
 def index():
-    # Портал открывает игру как /start?session=<id>&token=<hmac>.
-    api.get_game_session_id()
+    try:
+        api.get_game_session()
+    except api.ApiError as exc:
+        return f"Игровая сессия отклонена: {exc}", 401
     init_session()
     return render_template('index.html',
                            themes=get_themes(),

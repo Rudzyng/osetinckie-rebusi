@@ -15,7 +15,13 @@
 
         <div class="app-header">
             <h1>📖 Решатор ребусов</h1>
-            <p>Осетинские ребусы</p>
+            <p>
+                {% if session.get('portal_user_name') %}
+                {{ session['portal_user_name'] }} · {{ session.get('portal_total_points', 0) }} очков
+                {% else %}
+                Осетинские ребусы
+                {% endif %}
+            </p>
         </div>
 
         <div class="app-nav">
